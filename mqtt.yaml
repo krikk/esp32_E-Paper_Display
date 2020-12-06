@@ -1,0 +1,18 @@
+mqtt:
+  broker: 192.168.11.23
+  username: user
+  password: password
+  
+  on_message: # Manueller refresh des Displays bei Änderung
+#    - topic: $devicename/display/refresh
+#      payload: "ON"
+#      then:
+#      - component.update: my_display
+    - topic: $devicename/ota_mode
+      payload: '1'
+      then:
+        - deep_sleep.prevent: deep_sleep_1
+    - topic: $devicename/sleep_mode
+      payload: '1'
+      then:
+        - deep_sleep.enter: deep_sleep_1

@@ -1,0 +1,39 @@
+# Example configuration entry
+esp32_ble_tracker:
+# Forellenblatt@Wohnzimmer = C4:7C:8D:61:B3:A8
+# Gruenlilie@Wohnzimmer = C4:7C:8D:6B:05:AC
+#
+sensor:
+  - platform: xiaomi_hhccjcy01
+    mac_address: 'C4:7C:8D:61:B3:A8'
+    temperature:
+      name: "Forellenblatt Temperature"
+    moisture:
+      name: "Forellenblatt Moisture"
+    illuminance:
+      name: "Forellenblatt Illuminance"
+    conductivity:
+      name: "Forellenblatt Soil Conductivity"
+    battery_level:
+      name: "Forellenblatt Battery Level"
+
+  - platform: xiaomi_hhccjcy01
+    mac_address: 'C4:7C:8D:6B:05:AC'
+    temperature:
+      name: "Gruenlilie Temperature"
+    moisture:
+      name: "Gruenlilie Moisture"
+    illuminance:
+      name: "Gruenlilie Illuminance"
+    conductivity:
+      name: "Gruenlilie Soil Conductivity"
+    battery_level:
+      name: "Gruenlilie Battery Level"
+
+  - platform: ble_rssi
+    mac_address: C4:7C:8D:61:B3:A8
+    name: "Forellenblatt RSSI value"
+
+  - platform: ble_rssi
+    mac_address: C4:7C:8D:6B:05:AC
+    name: "Gruenlilie RSSI value"
