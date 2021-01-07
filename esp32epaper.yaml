@@ -9,10 +9,27 @@ esphome:
     upload_speed: 921600
     board_build.f_flash: 80000000L
 
+
 packages:
   wifi: !include wifi.yaml
   mqtt: !include mqtt.yaml
 #  ble: !include ble.yaml
+
+
+mqtt:
+  on_message: # Manueller refresh des Displays bei Änderung
+    - topic: $devicename/display/refresh
+      payload: "1"
+      then:
+        - component.update: my_display
+    - topic: $devicename/ota_mode
+      payload: '1'
+      then:
+        - deep_sleep.prevent: deep_sleep_1
+    - topic: $devicename/sleep_mode
+      payload: '1'
+      then:
+        - deep_sleep.enter: deep_sleep_1
 
 # Enable logging
 logger:
@@ -20,16 +37,16 @@ logger:
 #  level: ERROR
 
 
-time:
-  - platform: sntp
-    servers : 192.168.11.1
+#time:
+#  - platform: sntp
+#    servers : 192.168.11.1
 
-web_server:
-  port: 80
+#web_server:
+#  port: 80
 
-switch:
-  - platform: restart
-    name: "$devicename Restart"
+#switch:
+#  - platform: restart
+#    name: "$devicename Restart"
 
 text_sensor:
   - platform: mqtt_subscribe
@@ -47,22 +64,22 @@ uart:
   baud_rate: 9600
 
 sensor:
-  - platform: uptime
-    name: "$devicename Uptime Sensor"
+#  - platform: uptime
+#    name: "$devicename Uptime Sensor"
 
   - platform: wifi_signal
     name: "$devicename WiFi Signal Sensor"
-    update_interval: 60s
+    update_interval: 5min
 
-  - platform: mhz19
-    co2:
-      name: "$devicename MH-Z19 CO2 Value"
-      id: sensorMHZ19CO2
-    temperature:
-      name: "$devicename MH-Z19 Temperature"
-      id: sensorMHZ19Temperatur
-    update_interval: 60s
-    automatic_baseline_calibration: false
+#  - platform: mhz19
+#    co2:
+#      name: "$devicename MH-Z19 CO2 Value"
+#      id: sensorMHZ19CO2
+#    temperature:
+#      name: "$devicename MH-Z19 Temperature"
+#      id: sensorMHZ19Temperatur
+#    update_interval: 60s
+#    automatic_baseline_calibration: false
 
 spi:
   clk_pin: GPIO19
@@ -72,7 +89,7 @@ spi:
 font:
   - file: "Roboto-Regular.ttf"
     id: fontRoboto
-    size: 20
+    size: 40
 
 display:
   - platform: waveshare_epaper
@@ -81,14 +98,19 @@ display:
     busy_pin: GPIO21
     reset_pin: GPIO22
     model: 7.50inV2
-    update_interval: 60s
+    update_interval: 3600s
     id: my_display
     lambda: |-
       it.print(0, 100, id(fontRoboto), "Hello World! und nu fuer mehr...");
-      it.printf(0, 200, id(fontRoboto), "Aussentemperatur ist: %s", id(sensorAussenTemperatur).state.c_str());
-      it.printf(0, 220, id(fontRoboto), "AussenLuftfeuchte ist: %s", id(sensorAussenLuftfeuchte).state.c_str());
-      it.printf(0, 260, id(fontRoboto), "MH-Z19 CO2 Value: %.0f", id(sensorMHZ19CO2).state);
-      it.printf(0, 280, id(fontRoboto), "MH-Z19 Temperature: %.1f", id(sensorMHZ19Temperatur).state);
+      if (id(sensorAussenTemperatur).has_state())  {
+        it.printf(0, 200, id(fontRoboto), "Aussentemperatur ist: %s", id(sensorAussenTemperatur).state.c_str());
+      }
+      //it.printf(0, 200, id(fontRoboto), "Aussentemperatur ist: %s", id(sensorAussenTemperatur).state.c_str());
+      if (id(sensorAussenLuftfeuchte).has_state())  {
+       it.printf(0, 240, id(fontRoboto), "AussenLuftfeuchte ist: %s", id(sensorAussenLuftfeuchte).state.c_str());
+      }
+      //it.printf(0, 260, id(fontRoboto), "MH-Z19 CO2 Value: %.0f", id(sensorMHZ19CO2).state);
+      //it.printf(0, 280, id(fontRoboto), "MH-Z19 Temperature: %.1f", id(sensorMHZ19Temperatur).state);
 
 
 # Example configuration entry

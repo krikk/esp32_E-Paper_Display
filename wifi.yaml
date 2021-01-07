@@ -1,6 +1,6 @@
 wifi:
-  ssid: "xxx"
-  password: "xxxxxxxx"
+  ssid: !secret wifi_ssid
+  password: !secret wifi_password 
   fast_connect: on
 
 # Optional manual IP
@@ -13,13 +13,13 @@ wifi:
 # Enable fallback hotspot (captive portal) in case wifi connection fails
 #  ap:
 #    ssid: "$devicename Fallback Hotspot"
-#    password: "xxxx"
+#    password: "xxxxxx"
 
 #captive_portal:
 
 # Enable Home Assistant API
 #api:
-#  password: "xxxx"
+#  password: !secret api_password
 
 ota:
-  password: "xxxx"
+  password: !secret ota_password
