@@ -12,11 +12,15 @@ esphome:
 
 packages:
   wifi: !include wifi.yaml
-  mqtt: !include mqtt.yaml
 #  ble: !include ble.yaml
 
 
 mqtt:
+  broker: !secret mqtt_host
+  username: !secret mqtt_user
+  password: !secret mqtt_password
+  discovery: false
+  client_id: $devicename
   on_message: # Manueller refresh des Displays bei Änderung
     - topic: $devicename/display/refresh
       payload: "1"
