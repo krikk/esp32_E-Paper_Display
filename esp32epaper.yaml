@@ -8,8 +8,16 @@ esphome:
   platformio_options: 
     upload_speed: 921600
     board_build.f_flash: 80000000L
-
-
+  on_boot:
+    priority: -100
+    then:
+        - logger.log: "boot ready..."
+        - delay: 6s
+        - logger.log: "delayed 6s... update display"
+        - component.update: my_display      
+        - logger.log: "display update finished"
+        - delay: 7s
+        - deep_sleep.enter: deep_sleep_1
 packages:
   wifi: !include wifi.yaml
 #  ble: !include ble.yaml
@@ -61,7 +69,9 @@ text_sensor:
     name: "AussenLuftfeuchte"
     id: sensorAussenLuftfeuchte
     topic: AussenLuftfeuchte
-
+    on_value:
+      then:
+        - logger.log: "Value recieved..."
 uart:
   rx_pin: GPIO26
   tx_pin: GPIO25
@@ -105,11 +115,11 @@ display:
     update_interval: 3600s
     id: my_display
     lambda: |-
-      it.print(0, 100, id(fontRoboto), "Hello World! und nu fuer mehr...");
+      it.print(0, 100, id(fontRoboto), "Hello World! 1");
+      it.print(300, 100, id(fontRoboto), "Hello World! 2 ");
       if (id(sensorAussenTemperatur).has_state())  {
         it.printf(0, 200, id(fontRoboto), "Aussentemperatur ist: %s", id(sensorAussenTemperatur).state.c_str());
       }
-      //it.printf(0, 200, id(fontRoboto), "Aussentemperatur ist: %s", id(sensorAussenTemperatur).state.c_str());
       if (id(sensorAussenLuftfeuchte).has_state())  {
        it.printf(0, 240, id(fontRoboto), "AussenLuftfeuchte ist: %s", id(sensorAussenLuftfeuchte).state.c_str());
       }
@@ -119,7 +129,7 @@ display:
 
 # Example configuration entry
 deep_sleep:
-  run_duration: 10s
+  # run_duration: 12s
   sleep_duration: 1min
   id: deep_sleep_1
 
