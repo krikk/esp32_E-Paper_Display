@@ -1,5 +1,11 @@
 substitutions:
   devicename: esp32epaper
+  
+globals:
+  - id: prevent_sleep
+    type: bool
+    restore_value: no
+    initial_value: "false"
 
 esphome:
   name: $devicename
@@ -11,13 +17,21 @@ esphome:
   on_boot:
     priority: -100
     then:
-        - logger.log: "boot ready..."
-        - delay: 6s
-        - logger.log: "delayed 6s... update display"
-        - component.update: my_display      
-        - logger.log: "display update finished"
-        - delay: 7s
-        - deep_sleep.enter: deep_sleep_1
+      - logger.log: "boot ready..."
+      - delay: 2s
+      - logger.log: "delayed 2s... update display"
+      - component.update: my_display      
+      - delay: 6s
+      - logger.log: "delayed 6s..."
+      - if:
+          condition:
+            lambda: 'return id(prevent_sleep);'
+          then:
+            - logger.log: "OTA Mode"
+          else:
+            - deep_sleep.enter: deep_sleep_1
+      
+        
 packages:
   wifi: !include wifi.yaml
 #  ble: !include ble.yaml
@@ -30,15 +44,18 @@ mqtt:
   discovery: false
   client_id: $devicename
   on_message: # Manueller refresh des Displays bei Änderung
-    - topic: $devicename/display/refresh
+    - topic: $devicename/input/refresh_display
       payload: "1"
       then:
         - component.update: my_display
-    - topic: $devicename/ota_mode
+    - topic: $devicename/input/ota_mode
       payload: '1'
       then:
+        - globals.set:
+            id: prevent_sleep
+            value: 'true'
         - deep_sleep.prevent: deep_sleep_1
-    - topic: $devicename/sleep_mode
+    - topic: $devicename/input/sleep_mode
       payload: '1'
       then:
         - deep_sleep.enter: deep_sleep_1
@@ -46,12 +63,14 @@ mqtt:
 # Enable logging
 logger:
   level: DEBUG
-#  level: ERROR
+  # level: ERROR
 
 
-#time:
-#  - platform: sntp
-#    servers : 192.168.11.1
+time:
+ - platform: sntp
+   id: current_time
+   timezone: Europe/Vienna
+   servers : 192.168.11.1
 
 #web_server:
 #  port: 80
@@ -63,15 +82,52 @@ logger:
 text_sensor:
   - platform: mqtt_subscribe
     name: "AussenTemperatur"
-    id: sensorAussenTemperatur
-    topic: AussenTemperatur
+    id: outside_temperature
+    topic: esp32epaper/input/AussenTemperatur
   - platform: mqtt_subscribe
     name: "AussenLuftfeuchte"
     id: sensorAussenLuftfeuchte
-    topic: AussenLuftfeuchte
+    topic: esp32epaper/input/AussenLuftfeuchte
     on_value:
       then:
         - logger.log: "Value recieved..."
+
+  - platform: mqtt_subscribe
+    id: top_consumer
+    topic: esp32epaper/input/PVPower
+
+
+  - platform: mqtt_subscribe
+    name: forecast
+    id: weather_forecast
+    topic: sensor.forecast
+
+
+  - platform: mqtt_subscribe
+    name: forecast
+    id: weather_forecast_today
+    topic: sensor.forecast_today
+
+
+  - platform: mqtt_subscribe
+    id: moon_icon
+    topic: sensor.moon_tpl
+
+  - platform: mqtt_subscribe
+    id: inside_temperature
+    topic: esp32epaper/input/InsideTemperature
+
+
+
+  - platform: mqtt_subscribe
+    topic: esp32epaper/input/TotalPower
+    id: sparsnas
+
+
+  - platform: mqtt_subscribe
+    topic: sensor.dark_sky_precip_probability
+    id: precip_probability
+ 
 uart:
   rx_pin: GPIO26
   tx_pin: GPIO25
@@ -83,17 +139,11 @@ sensor:
 
   - platform: wifi_signal
     name: "$devicename WiFi Signal Sensor"
+    id: wifisignal
     update_interval: 5min
 
-#  - platform: mhz19
-#    co2:
-#      name: "$devicename MH-Z19 CO2 Value"
-#      id: sensorMHZ19CO2
-#    temperature:
-#      name: "$devicename MH-Z19 Temperature"
-#      id: sensorMHZ19Temperatur
-#    update_interval: 60s
-#    automatic_baseline_calibration: false
+
+
 
 spi:
   clk_pin: GPIO19
@@ -101,9 +151,109 @@ spi:
 #  miso_pin: GPIO5
 
 font:
-  - file: "Roboto-Regular.ttf"
+  - file: "fonts/Roboto-Regular.ttf"
     id: fontRoboto
     size: 40
+  - file: 'fonts/Google_Sans_Bold.ttf'
+    id: clock_font
+    size: 90
+    glyphs: [0, 1, 2, 3, 4, 5, 6, 7 ,8, 9, ':']
+  - file: 'fonts/Google_Sans_Medium.ttf'
+    id: temp_font
+    size: 32
+    glyphs:
+      ['&', '@', '!', ',', '.', '"', '%', '(', ')', '+', '-', '_', ':', '°', '0',
+       '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E',
+       'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S',
+       'T', 'U', 'V', 'W', 'X', 'Y', 'Z', ' ', 'a', 'b', 'c', 'd', 'e', 'f',
+       'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't',
+       'u', 'v', 'w', 'x', 'y', 'z','å', 'ä', 'ö', '/']
+  - file: 'fonts/Google_Sans_Bold.ttf'
+    id: status_font
+    size: 18
+    glyphs:
+      ['&', '@', '!', ',', '.', '"', '%', '(', ')', '+', '-', '_', ':', '°', '0',
+       '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E',
+       'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S',
+       'T', 'U', 'V', 'W', 'X', 'Y', 'Z', ' ', 'a', 'b', 'c', 'd', 'e', 'f',
+       'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't',
+       'u', 'v', 'w', 'x', 'y', 'z', 'å', 'ä', 'ö', '/']
+  - file: 'fonts/materialdesignicons-webfont.ttf'
+    id: icon_font
+    size: 32
+    glyphs: [
+      '', # mdi-account-heart
+      '', # mdi-thermometer
+      '󰅢', # mdi-fire-hydrant
+      "", # mdi-umbrella
+      "ｲ", # mdi-home-thermometer-outline
+      "ｱ", # mdi-home-thermometer
+      # Wifi
+      '冷', # mdi-wifi-strength-outline
+      '爛', # mdi-wifi-strength-1
+      '嵐', # mdi-wifi-strength-2
+      '襤', # mdi-wifi-strength-3
+      '蠟', # mdi-wifi-strength-4
+      # Weather
+      "", # mdi-weather-sunny
+      "", # mdi-weather-night
+      "", # mdi-weather-cloudy
+      "", # mdi-weather-pouring
+      "", # mdi-weather-snowy-rainy
+      "ｓ", # mdi-weather-snowy-heavy
+      "", # mdi-weather-windy-variant
+      "", # mdi-weather-fog
+      "ｎ", # mdi-weather-night-partly-cloudy
+      "", # mdi-weather-partly-cloudy
+      # Moon
+      "ﾁ", # new_moon
+      "ﾄ", # waxing_crecent
+      "ｾ", # first_quarter
+      "ﾅ", # waxing_gibbous
+      "ｿ", # full_moon
+      "ﾃ", # waning_gibbous
+      "ﾀ", # last_quarter
+      "ﾂ", # waning_crescent
+      # Sun
+      "", # mdi-weather-sunset-down
+      "", # mdi-weather-sunset-up
+      ]
+  - file: 'fonts/materialdesignicons-webfont.ttf'
+    id: weather_font
+    size: 50
+    glyphs: [
+      '', # mdi-account-heart
+      '', # mdi-thermometer
+      '󰅢', # mdi-fire-hydrant
+      "", # mdi-umbrella
+      "ｲ", # mdi-home-thermometer-outline
+      # Wifi
+      '冷', # mdi-wifi-strength-outline
+      '爛', # mdi-wifi-strength-1
+      '嵐', # mdi-wifi-strength-2
+      '襤', # mdi-wifi-strength-3
+      '蠟', # mdi-wifi-strength-4
+      # Weather
+      "", # mdi-weather-sunny
+      "", # mdi-weather-night
+      "", # mdi-weather-cloudy
+      "", # mdi-weather-pouring
+      "", # mdi-weather-snowy-rainy
+      "ｓ", # mdi-weather-snowy-heavy
+      "", # mdi-weather-windy-variant
+      "", # mdi-weather-fog
+      "ｎ", # mdi-weather-night-partly-cloudy
+      "", # mdi-weather-partly-cloudy
+      # Moon
+      "ﾁ", # new_moon
+      "ﾄ", # waxing_crecent
+      "ｾ", # first_quarter
+      "ﾅ", # waxing_gibbous
+      "ｿ", # full_moon
+      "ﾃ", # waning_gibbous
+      "ﾀ", # last_quarter
+      "ﾂ", # waning_crescent
+      ]
 
 display:
   - platform: waveshare_epaper
@@ -112,24 +262,140 @@ display:
     busy_pin: GPIO21
     reset_pin: GPIO22
     model: 7.50inV2
-    update_interval: 3600s
+    update_interval: never
     id: my_display
-    lambda: |-
-      it.print(0, 100, id(fontRoboto), "Hello World! 1");
-      it.print(300, 100, id(fontRoboto), "Hello World! 2 ");
-      if (id(sensorAussenTemperatur).has_state())  {
-        it.printf(0, 200, id(fontRoboto), "Aussentemperatur ist: %s", id(sensorAussenTemperatur).state.c_str());
+    lambda: |
+      int x, y;
+      ESP_LOGI("display", "Updating..");
+
+      /* Print time in HH:MM format */
+      it.strftime(125, -10, id(clock_font), TextAlign::TOP_CENTER, "%H:%M", id(current_time).now());
+
+      it.line(259, -10, 259, 200);it.line(261, 0, 261, 200);it.line(260, 0, 260, 200);
+      it.line(0, 200, 259, 200);it.line(0, 201, 261, 201);it.line(0, 202, 260, 202);
+      /*
+      it.print(125, 120, id(temp_font), TextAlign::BASELINE_CENTER, "HELLO SUNSHINE!");
+      it.print(125, 160, id(icon_font), TextAlign::BASELINE_CENTER, "");
+      it.print(125, 182, id(temp_font), TextAlign::BASELINE_CENTER, "Lea & Emma"); // 400 - ((400 - 260)/2)
+      */
+      /* Moon icon */
+      if(id(moon_icon).has_state()) {
+        y = 155, x = 230;
+        ESP_LOGI("Moon icon", "%s", id(moon_icon).state.c_str());
+        it.printf(x, y, id(weather_font), TextAlign::BASELINE_CENTER, "%s", id(moon_icon).state.c_str());
       }
-      if (id(sensorAussenLuftfeuchte).has_state())  {
-       it.printf(0, 240, id(fontRoboto), "AussenLuftfeuchte ist: %s", id(sensorAussenLuftfeuchte).state.c_str());
+      /* WiFi Signal Strenght */
+      if(id(wifisignal).has_state()) {
+        x = 798, y = 478;
+        if (id(wifisignal).state >= -50) {
+            //Excellent
+            it.print(x, y, id(icon_font), TextAlign::BOTTOM_RIGHT, "蠟");
+            ESP_LOGI("WiFi", "Exellent");
+        } else if (id(wifisignal).state  >= -60) {
+            //Good
+            it.print(x, y, id(icon_font), TextAlign::BOTTOM_RIGHT, "襤");
+            ESP_LOGI("WiFi", "Good");
+        } else if (id(wifisignal).state  >= -67) {
+            //Fair
+            it.print(x, y, id(icon_font), TextAlign::BOTTOM_RIGHT, "嵐");
+            ESP_LOGI("WiFi", "Fair");
+        } else if (id(wifisignal).state  >= -70) {
+            //Weak
+            it.print(x, y, id(icon_font), TextAlign::BOTTOM_RIGHT, "爛");
+            ESP_LOGI("WiFi", "Weak");
+        } else {
+            //Unlikely working signal
+            it.print(x, y, id(icon_font), TextAlign::BOTTOM_RIGHT, "冷");
+            ESP_LOGI("WiFi", "Unlikely");
+        }
       }
-      //it.printf(0, 260, id(fontRoboto), "MH-Z19 CO2 Value: %.0f", id(sensorMHZ19CO2).state);
-      //it.printf(0, 280, id(fontRoboto), "MH-Z19 Temperature: %.1f", id(sensorMHZ19Temperatur).state);
+
+      // Current weather
+      if(id(weather_forecast_today).has_state()) {
+        std::string str = id(weather_forecast_today).state;
+        ESP_LOGI("Weather", "%s", str.c_str());
+        std::size_t current, previous = 0;
+        char delim = ';';
+        current = str.find(delim);
+        int y = 140, x = 5;
+        for (int i=0; i<3; i++) {
+            if(i == 0) {
+              it.printf(x, y, id(weather_font),
+                TextAlign::BASELINE_LEFT,
+                "%s", str.substr(previous, current - previous).c_str());
+            } else if (i == 1) {
+              ESP_LOGD("weather","%dx%d %s", (i % 1 ? 270 : 320), x,
+                str.substr(previous, current - previous).c_str());
+              /* it.printf(y, x, id(status_font),
+                TextAlign::TOP_LEFT,
+                "%s", str.substr(previous, current - previous).c_str());
+              */
+            } else if (i == 2) { // Chance for rain
+              it.printf(x, y + 2, id(icon_font), TextAlign::TOP_LEFT, ""); // Umbrella
+              it.printf(x + 30, y + 10, id(status_font),
+                TextAlign::TOP_LEFT,
+                "%s%%", str.substr(previous, current - previous).c_str());
+            }
+            // y += 100;
+            previous = current + 1;
+            current = str.find(delim, previous);
+        }
+      }
+
+      // Print inside temperature (from homeassistant sensor)
+      y = 135, x = 102;
+      if (id(inside_temperature).has_state()) {
+        it.print(x, y, id(icon_font), TextAlign::BOTTOM_RIGHT, "ｱ");
+        it.printf(x+2, y, id(temp_font), TextAlign::BOTTOM_LEFT , "%s°", id(inside_temperature).state.c_str());
+      }
+      // Print outside temperature (from homeassistant sensor)
+      if (id(outside_temperature).has_state()) {
+        it.print(x, y, id(icon_font), TextAlign::TOP_RIGHT, "ｲ"); 
+        it.printf(x+2, y, id(temp_font), TextAlign::TOP_LEFT, "%s°", id(outside_temperature).state.c_str());
+      }
+
+      // Print consumer
+      if (id(top_consumer).has_state()) {
+        it.printf(0, 470, id(temp_font), TextAlign::BOTTOM_LEFT , "Total: %s W, PV Output %s W", id(sparsnas).state.c_str(), id(top_consumer).state.c_str());
+
+      }
+      // it.line(0, 299, 400, 299);
+
+      // std::string str = "mon:cloud:12.1:30%:tue:rain:10.2:40%:wed:sunny:18.0:0%:thu:snow:-12.2:10%";
+      if(id(weather_forecast).has_state()) {
+        std::string str = id(weather_forecast).state;
+        ESP_LOGI("Weather", "%s", str.c_str());
+        std::size_t current, previous = 0;
+        char delim = ';';
+        current = str.find(delim);
+        int x = 340, y = 4;
+        for (int i=0; i<4; i++) {
+          ESP_LOGI("t", "%d", i);
+          for (int j=0; j<4; j++) {
+            if(j == 1) {  // Weather icon.
+              it.printf(x - 65, y + 25, id(weather_font),
+                TextAlign::BASELINE_LEFT,
+                "%s", str.substr(previous, current - previous).c_str());
+            } else {
+              ESP_LOGD("weather","%dx%d %s", (j % 1 ? 270 : 320), x,
+                str.substr(previous, current - previous).c_str());
+              it.printf((j == 0 ? x - 10 : 390), y,
+                id(status_font),
+                (j == 0 ? TextAlign::TOP_LEFT : TextAlign::TOP_RIGHT),
+                "%s", str.substr(previous, current - previous).c_str());
+              y += 16;
+            }
+            previous = current + 1;
+            current = str.find(delim, previous);
+          }
+          y += 2;
+        }
+      }
 
 
 # Example configuration entry
 deep_sleep:
-  # run_duration: 12s
+  run_duration: 15s
   sleep_duration: 1min
   id: deep_sleep_1
 
