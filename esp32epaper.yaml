@@ -18,11 +18,11 @@ esphome:
     priority: -100
     then:
       - logger.log: "boot ready..."
-      # - delay: 1s
-      # - logger.log: "delayed 2s... update display"
+      - delay: 1s
+      - logger.log: "delayed 1s... update display"
       - component.update: my_display      
-      - delay: 7s
-      - logger.log: "delayed 7s..."
+      - delay: 6s
+      - logger.log: "delayed 6s..."
       - if:
           condition:
             lambda: 'return id(prevent_sleep);'
