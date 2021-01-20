@@ -18,8 +18,8 @@ esphome:
     priority: -100
     then:
       - logger.log: "boot ready..."
-      - delay: 2s
-      - logger.log: "delayed 2s... update display"
+      # - delay: 1s
+      # - logger.log: "delayed 2s... update display"
       - component.update: my_display      
       - delay: 7s
       - logger.log: "delayed 7s..."
@@ -29,8 +29,20 @@ esphome:
           then:
             - logger.log: "OTA Mode"
           else:
-            - deep_sleep.enter: deep_sleep_1
-      
+            if:
+              condition:
+                # adjust sleep time to hour of the day
+                lambda: 'return (5 > id(current_time).now().hour && id(current_time).now().hour > 22) ;'
+              then:
+                - logger.log: "nighttime..."
+                - lambda: |-
+                    id(deep_sleep_1).set_sleep_duration(300000);
+                - deep_sleep.enter: deep_sleep_1
+              else:
+                - logger.log: "daytime..."
+                - lambda: |-
+                    id(deep_sleep_1).set_sleep_duration(60000);
+                - deep_sleep.enter: deep_sleep_1      
         
 packages:
   wifi: !include wifi.yaml
@@ -88,9 +100,9 @@ text_sensor:
     name: "AussenLuftfeuchte"
     id: sensorAussenLuftfeuchte
     topic: esp32epaper/input/AussenLuftfeuchte
-    on_value:
-      then:
-        - logger.log: "Value recieved..."
+    # on_value:
+      # then:
+        # - logger.log: "Value recieved..."
 
   - platform: mqtt_subscribe
     id: top_consumer
@@ -141,8 +153,6 @@ sensor:
     name: "$devicename WiFi Signal Sensor"
     id: wifisignal
     update_interval: 5min
-
-
 
 
 spi:
@@ -395,7 +405,7 @@ display:
 
 # Example configuration entry
 deep_sleep:
-  run_duration: 15s
+  run_duration: 10s
   sleep_duration: 1min
   id: deep_sleep_1
 
