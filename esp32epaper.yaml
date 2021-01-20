@@ -21,8 +21,8 @@ esphome:
       - delay: 2s
       - logger.log: "delayed 2s... update display"
       - component.update: my_display      
-      - delay: 6s
-      - logger.log: "delayed 6s..."
+      - delay: 7s
+      - logger.log: "delayed 7s..."
       - if:
           condition:
             lambda: 'return id(prevent_sleep);'
@@ -62,8 +62,8 @@ mqtt:
 
 # Enable logging
 logger:
-  level: DEBUG
-  # level: ERROR
+  # level: DEBUG
+  level: ERROR
 
 
 time:
