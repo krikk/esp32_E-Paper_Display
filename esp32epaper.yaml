@@ -6,7 +6,11 @@ globals:
     type: bool
     restore_value: no
     initial_value: "false"
-
+  - id: valueCount
+    type: int
+    restore_value: no
+    initial_value: "0"
+    
 esphome:
   name: $devicename
   platform: ESP32
@@ -18,11 +22,11 @@ esphome:
     priority: -100
     then:
       - logger.log: "boot ready..."
-      - delay: 1s
-      - logger.log: "delayed 1s... update display"
-      - component.update: my_display      
-      - delay: 6s
-      - logger.log: "delayed 6s..."
+      # - delay: 1s
+      # - logger.log: "delayed 1s... update display"
+      # - component.update: my_display      
+      # - delay: 6s
+      # - logger.log: "delayed 6s..."
       - if:
           condition:
             lambda: 'return id(prevent_sleep);'
@@ -32,18 +36,31 @@ esphome:
             if:
               condition:
                 # adjust sleep time to hour of the day
-                lambda: 'return (5 > id(current_time).now().hour && id(current_time).now().hour > 22) ;'
+                lambda: 'return ((id(current_time).now().hour < 6) || (id(current_time).now().hour > 22)) ;'
               then:
                 - logger.log: "nighttime..."
                 - lambda: |-
-                    id(deep_sleep_1).set_sleep_duration(300000);
-                - deep_sleep.enter: deep_sleep_1
+                    id(deep_sleep_1).set_sleep_duration(5*60*1000);
+                # - deep_sleep.enter: deep_sleep_1
               else:
                 - logger.log: "daytime..."
                 - lambda: |-
-                    id(deep_sleep_1).set_sleep_duration(60000);
-                - deep_sleep.enter: deep_sleep_1      
-        
+                    id(deep_sleep_1).set_sleep_duration(60*1000);
+                # - deep_sleep.enter: deep_sleep_1      
+  on_loop:
+    then:
+      - if:
+          condition:
+            lambda: 'return (id(valueCount) == 5) ;'
+          then:
+            - logger.log: "all values ready..."
+            - lambda: 'id(valueCount) += 1;'
+            - component.update: my_display
+            - delay: 6s
+            - logger.log: "delayed 6s..."
+            - deep_sleep.enter: deep_sleep_1
+          # else:
+            # - logger.log: "waiting for values..."
 packages:
   wifi: !include wifi.yaml
 #  ble: !include ble.yaml
@@ -96,30 +113,28 @@ text_sensor:
     name: "AussenTemperatur"
     id: outside_temperature
     topic: esp32epaper/input/AussenTemperatur
+    on_value:
+      then:
+        - lambda: |-
+            id(valueCount) += 1;
+
   - platform: mqtt_subscribe
     name: "AussenLuftfeuchte"
     id: sensorAussenLuftfeuchte
     topic: esp32epaper/input/AussenLuftfeuchte
-    # on_value:
-      # then:
-        # - logger.log: "Value recieved..."
+    on_value:
+      then:
+        - lambda: |-
+            id(valueCount) += 1;
 
   - platform: mqtt_subscribe
     id: top_consumer
     topic: esp32epaper/input/PVPower
-
-
-  - platform: mqtt_subscribe
-    name: forecast
-    id: weather_forecast
-    topic: sensor.forecast
-
-
-  - platform: mqtt_subscribe
-    name: forecast
-    id: weather_forecast_today
-    topic: sensor.forecast_today
-
+    on_value:
+      then:
+        - logger.log: "Value recieved..."
+        - lambda: |-
+            id(valueCount) += 1;
 
   - platform: mqtt_subscribe
     id: moon_icon
@@ -128,17 +143,20 @@ text_sensor:
   - platform: mqtt_subscribe
     id: inside_temperature
     topic: esp32epaper/input/InsideTemperature
-
-
+    on_value:
+      then:
+        - logger.log: "Value recieved..."
+        - lambda: |-
+            id(valueCount) += 1;
 
   - platform: mqtt_subscribe
     topic: esp32epaper/input/TotalPower
     id: sparsnas
-
-
-  - platform: mqtt_subscribe
-    topic: sensor.dark_sky_precip_probability
-    id: precip_probability
+    on_value:
+      then:
+        - logger.log: "Value recieved..."
+        - lambda: |-
+            id(valueCount) += 1;
  
 uart:
   rx_pin: GPIO26
@@ -170,7 +188,7 @@ font:
     glyphs: [0, 1, 2, 3, 4, 5, 6, 7 ,8, 9, ':']
   - file: 'fonts/Google_Sans_Medium.ttf'
     id: temp_font
-    size: 32
+    size: 64
     glyphs:
       ['&', '@', '!', ',', '.', '"', '%', '(', ')', '+', '-', '_', ':', '°', '0',
        '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E',
@@ -180,7 +198,7 @@ font:
        'u', 'v', 'w', 'x', 'y', 'z','å', 'ä', 'ö', '/']
   - file: 'fonts/Google_Sans_Bold.ttf'
     id: status_font
-    size: 18
+    size: 36
     glyphs:
       ['&', '@', '!', ',', '.', '"', '%', '(', ')', '+', '-', '_', ':', '°', '0',
        '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E',
@@ -190,7 +208,7 @@ font:
        'u', 'v', 'w', 'x', 'y', 'z', 'å', 'ä', 'ö', '/']
   - file: 'fonts/materialdesignicons-webfont.ttf'
     id: icon_font
-    size: 32
+    size: 64
     glyphs: [
       '', # mdi-account-heart
       '', # mdi-thermometer
@@ -204,17 +222,6 @@ font:
       '嵐', # mdi-wifi-strength-2
       '襤', # mdi-wifi-strength-3
       '蠟', # mdi-wifi-strength-4
-      # Weather
-      "", # mdi-weather-sunny
-      "", # mdi-weather-night
-      "", # mdi-weather-cloudy
-      "", # mdi-weather-pouring
-      "", # mdi-weather-snowy-rainy
-      "ｓ", # mdi-weather-snowy-heavy
-      "", # mdi-weather-windy-variant
-      "", # mdi-weather-fog
-      "ｎ", # mdi-weather-night-partly-cloudy
-      "", # mdi-weather-partly-cloudy
       # Moon
       "ﾁ", # new_moon
       "ﾄ", # waxing_crecent
@@ -243,17 +250,6 @@ font:
       '嵐', # mdi-wifi-strength-2
       '襤', # mdi-wifi-strength-3
       '蠟', # mdi-wifi-strength-4
-      # Weather
-      "", # mdi-weather-sunny
-      "", # mdi-weather-night
-      "", # mdi-weather-cloudy
-      "", # mdi-weather-pouring
-      "", # mdi-weather-snowy-rainy
-      "ｓ", # mdi-weather-snowy-heavy
-      "", # mdi-weather-windy-variant
-      "", # mdi-weather-fog
-      "ｎ", # mdi-weather-night-partly-cloudy
-      "", # mdi-weather-partly-cloudy
       # Moon
       "ﾁ", # new_moon
       "ﾄ", # waxing_crecent
@@ -281,8 +277,8 @@ display:
       /* Print time in HH:MM format */
       it.strftime(125, -10, id(clock_font), TextAlign::TOP_CENTER, "%H:%M", id(current_time).now());
 
-      it.line(259, -10, 259, 200);it.line(261, 0, 261, 200);it.line(260, 0, 260, 200);
-      it.line(0, 200, 259, 200);it.line(0, 201, 261, 201);it.line(0, 202, 260, 202);
+      //it.line(259, -10, 259, 200);it.line(261, 0, 261, 200);it.line(260, 0, 260, 200);
+      //it.line(0, 200, 259, 200);it.line(0, 201, 261, 201);it.line(0, 202, 260, 202);
       /*
       it.print(125, 120, id(temp_font), TextAlign::BASELINE_CENTER, "HELLO SUNSHINE!");
       it.print(125, 160, id(icon_font), TextAlign::BASELINE_CENTER, "");
@@ -320,40 +316,9 @@ display:
         }
       }
 
-      // Current weather
-      if(id(weather_forecast_today).has_state()) {
-        std::string str = id(weather_forecast_today).state;
-        ESP_LOGI("Weather", "%s", str.c_str());
-        std::size_t current, previous = 0;
-        char delim = ';';
-        current = str.find(delim);
-        int y = 140, x = 5;
-        for (int i=0; i<3; i++) {
-            if(i == 0) {
-              it.printf(x, y, id(weather_font),
-                TextAlign::BASELINE_LEFT,
-                "%s", str.substr(previous, current - previous).c_str());
-            } else if (i == 1) {
-              ESP_LOGD("weather","%dx%d %s", (i % 1 ? 270 : 320), x,
-                str.substr(previous, current - previous).c_str());
-              /* it.printf(y, x, id(status_font),
-                TextAlign::TOP_LEFT,
-                "%s", str.substr(previous, current - previous).c_str());
-              */
-            } else if (i == 2) { // Chance for rain
-              it.printf(x, y + 2, id(icon_font), TextAlign::TOP_LEFT, ""); // Umbrella
-              it.printf(x + 30, y + 10, id(status_font),
-                TextAlign::TOP_LEFT,
-                "%s%%", str.substr(previous, current - previous).c_str());
-            }
-            // y += 100;
-            previous = current + 1;
-            current = str.find(delim, previous);
-        }
-      }
 
       // Print inside temperature (from homeassistant sensor)
-      y = 135, x = 102;
+      y = 155, x = 102;
       if (id(inside_temperature).has_state()) {
         it.print(x, y, id(icon_font), TextAlign::BOTTOM_RIGHT, "ｱ");
         it.printf(x+2, y, id(temp_font), TextAlign::BOTTOM_LEFT , "%s°", id(inside_temperature).state.c_str());
@@ -366,46 +331,16 @@ display:
 
       // Print consumer
       if (id(top_consumer).has_state()) {
-        it.printf(0, 470, id(temp_font), TextAlign::BOTTOM_LEFT , "Total: %s W, PV Output %s W", id(sparsnas).state.c_str(), id(top_consumer).state.c_str());
+        it.printf(0, 480, id(temp_font), TextAlign::BOTTOM_LEFT , "Total: %s W, PV: %s W", id(sparsnas).state.c_str(), id(top_consumer).state.c_str());
 
       }
       // it.line(0, 299, 400, 299);
 
-      // std::string str = "mon:cloud:12.1:30%:tue:rain:10.2:40%:wed:sunny:18.0:0%:thu:snow:-12.2:10%";
-      if(id(weather_forecast).has_state()) {
-        std::string str = id(weather_forecast).state;
-        ESP_LOGI("Weather", "%s", str.c_str());
-        std::size_t current, previous = 0;
-        char delim = ';';
-        current = str.find(delim);
-        int x = 340, y = 4;
-        for (int i=0; i<4; i++) {
-          ESP_LOGI("t", "%d", i);
-          for (int j=0; j<4; j++) {
-            if(j == 1) {  // Weather icon.
-              it.printf(x - 65, y + 25, id(weather_font),
-                TextAlign::BASELINE_LEFT,
-                "%s", str.substr(previous, current - previous).c_str());
-            } else {
-              ESP_LOGD("weather","%dx%d %s", (j % 1 ? 270 : 320), x,
-                str.substr(previous, current - previous).c_str());
-              it.printf((j == 0 ? x - 10 : 390), y,
-                id(status_font),
-                (j == 0 ? TextAlign::TOP_LEFT : TextAlign::TOP_RIGHT),
-                "%s", str.substr(previous, current - previous).c_str());
-              y += 16;
-            }
-            previous = current + 1;
-            current = str.find(delim, previous);
-          }
-          y += 2;
-        }
-      }
 
 
 # Example configuration entry
 deep_sleep:
-  run_duration: 10s
-  sleep_duration: 1min
+  run_duration: 15s
+  sleep_duration: 2min
   id: deep_sleep_1
 
