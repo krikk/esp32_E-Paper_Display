@@ -51,13 +51,13 @@ esphome:
     then:
       - if:
           condition:
-            lambda: 'return (id(valueCount) == 5) ;'
+            lambda: 'return (id(valueCount) == 6) ;'
           then:
             - logger.log: "all values ready..."
             - lambda: 'id(valueCount) += 1;'
             - component.update: my_display
-            - delay: 6s
-            - logger.log: "delayed 6s..."
+            - delay: 7s
+            - logger.log: "delayed 7s..."
             - deep_sleep.enter: deep_sleep_1
           # else:
             # - logger.log: "waiting for values..."
@@ -109,6 +109,22 @@ time:
 #    name: "$devicename Restart"
 
 text_sensor:
+
+
+  - platform: mqtt_subscribe
+    id: moon_icon
+    topic: sensor.moon_tpl
+
+ 
+uart:
+  rx_pin: GPIO26
+  tx_pin: GPIO25
+  baud_rate: 9600
+
+sensor:
+#  - platform: uptime
+#    name: "$devicename Uptime Sensor"
+
   - platform: mqtt_subscribe
     name: "AussenTemperatur"
     id: outside_temperature
@@ -128,8 +144,9 @@ text_sensor:
             id(valueCount) += 1;
 
   - platform: mqtt_subscribe
-    id: top_consumer
-    topic: esp32epaper/input/PVPower
+    name: "Innentemperatur"
+    id: inside_temperature
+    topic: esp32epaper/input/InsideTemperature
     on_value:
       then:
         - logger.log: "Value recieved..."
@@ -137,12 +154,18 @@ text_sensor:
             id(valueCount) += 1;
 
   - platform: mqtt_subscribe
-    id: moon_icon
-    topic: sensor.moon_tpl
+    name: "Innen-Luftfeuchte"
+    id: InsideHumidity
+    topic: esp32epaper/input/InsideHumidity
+    on_value:
+      then:
+        - logger.log: "Value recieved..."
+        - lambda: |-
+            id(valueCount) += 1;
 
   - platform: mqtt_subscribe
-    id: inside_temperature
-    topic: esp32epaper/input/InsideTemperature
+    id: top_consumer
+    topic: esp32epaper/input/PVPower
     on_value:
       then:
         - logger.log: "Value recieved..."
@@ -157,15 +180,6 @@ text_sensor:
         - logger.log: "Value recieved..."
         - lambda: |-
             id(valueCount) += 1;
- 
-uart:
-  rx_pin: GPIO26
-  tx_pin: GPIO25
-  baud_rate: 9600
-
-sensor:
-#  - platform: uptime
-#    name: "$devicename Uptime Sensor"
 
   - platform: wifi_signal
     name: "$devicename WiFi Signal Sensor"
@@ -188,7 +202,7 @@ font:
     glyphs: [0, 1, 2, 3, 4, 5, 6, 7 ,8, 9, ':']
   - file: 'fonts/Google_Sans_Medium.ttf'
     id: temp_font
-    size: 64
+    size: 55
     glyphs:
       ['&', '@', '!', ',', '.', '"', '%', '(', ')', '+', '-', '_', ':', '°', '0',
        '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E',
@@ -208,7 +222,7 @@ font:
        'u', 'v', 'w', 'x', 'y', 'z', 'å', 'ä', 'ö', '/']
   - file: 'fonts/materialdesignicons-webfont.ttf'
     id: icon_font
-    size: 64
+    size: 55
     glyphs: [
       '', # mdi-account-heart
       '', # mdi-thermometer
@@ -321,18 +335,22 @@ display:
       y = 155, x = 102;
       if (id(inside_temperature).has_state()) {
         it.print(x, y, id(icon_font), TextAlign::BOTTOM_RIGHT, "ｱ");
-        it.printf(x+2, y, id(temp_font), TextAlign::BOTTOM_LEFT , "%s°", id(inside_temperature).state.c_str());
-      }
+        it.printf(x+2, y, id(temp_font), TextAlign::BOTTOM_LEFT , "%5.1f°C", id(inside_temperature).state);
+        }
+      if (id(InsideHumidity).has_state()) {
+        it.printf(x+x+x, y, id(temp_font), TextAlign::BOTTOM_LEFT , "%3.0f%%", id(InsideHumidity).state);
+        }
       // Print outside temperature (from homeassistant sensor)
       if (id(outside_temperature).has_state()) {
         it.print(x, y, id(icon_font), TextAlign::TOP_RIGHT, "ｲ"); 
-        it.printf(x+2, y, id(temp_font), TextAlign::TOP_LEFT, "%s°", id(outside_temperature).state.c_str());
+        it.printf(x+2, y, id(temp_font), TextAlign::TOP_LEFT, "%5.1f°C", id(outside_temperature).state);
       }
-
+      if (id(sensorAussenLuftfeuchte).has_state()) {
+        it.printf(x+x+x, y, id(temp_font), TextAlign::TOP_LEFT, "%3.0f%%", id(sensorAussenLuftfeuchte).state);
+      }
       // Print consumer
       if (id(top_consumer).has_state()) {
-        it.printf(0, 480, id(temp_font), TextAlign::BOTTOM_LEFT , "Total: %s W, PV: %s W", id(sparsnas).state.c_str(), id(top_consumer).state.c_str());
-
+        it.printf(0, 480, id(temp_font), TextAlign::BOTTOM_LEFT , "Verbr.: %.0f W, PV: %.0f W", id(sparsnas).state, id(top_consumer).state);
       }
       // it.line(0, 299, 400, 299);
 
