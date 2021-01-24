@@ -39,13 +39,11 @@ esphome:
                 lambda: 'return ((id(current_time).now().hour < 6) || (id(current_time).now().hour > 22)) ;'
               then:
                 - logger.log: "nighttime..."
-                - lambda: |-
-                    id(deep_sleep_1).set_sleep_duration(5*60*1000);
+                - lambda: 'id(deep_sleep_1).set_sleep_duration(5*60*1000);'
                 # - deep_sleep.enter: deep_sleep_1
               else:
                 - logger.log: "daytime..."
-                - lambda: |-
-                    id(deep_sleep_1).set_sleep_duration(60*1000);
+                - lambda: 'id(deep_sleep_1).set_sleep_duration(60*1000);'
                 # - deep_sleep.enter: deep_sleep_1      
   on_loop:
     then:
@@ -130,16 +128,14 @@ sensor:
     topic: esp32epaper/input/AussenTemperatur
     on_value:
       then:
-        - lambda: |-
-            id(valueCount) += 1;
+        - lambda: 'id(valueCount) += 1;'
 
   - platform: mqtt_subscribe
     id: sensorAussenLuftfeuchte
     topic: esp32epaper/input/AussenLuftfeuchte
     on_value:
       then:
-        - lambda: |-
-            id(valueCount) += 1;
+        - lambda: 'id(valueCount) += 1;'
 
   - platform: mqtt_subscribe
     id: inside_temperature
@@ -147,8 +143,7 @@ sensor:
     on_value:
       then:
         - logger.log: "Value recieved..."
-        - lambda: |-
-            id(valueCount) += 1;
+        - lambda: 'id(valueCount) += 1;'
 
   - platform: mqtt_subscribe
     id: InsideHumidity
@@ -156,8 +151,7 @@ sensor:
     on_value:
       then:
         - logger.log: "Value recieved..."
-        - lambda: |-
-            id(valueCount) += 1;
+        - lambda: 'id(valueCount) += 1;'
 
   - platform: mqtt_subscribe
     id: top_consumer
@@ -165,8 +159,7 @@ sensor:
     on_value:
       then:
         - logger.log: "Value recieved..."
-        - lambda: |-
-            id(valueCount) += 1;
+        - lambda: 'id(valueCount) += 1;'
 
   - platform: mqtt_subscribe
     topic: esp32epaper/input/TotalPower
@@ -174,8 +167,7 @@ sensor:
     on_value:
       then:
         - logger.log: "Value recieved..."
-        - lambda: |-
-            id(valueCount) += 1;
+        - lambda: 'id(valueCount) += 1;'
 
   - platform: wifi_signal
     name: "$devicename WiFi Signal Sensor"
