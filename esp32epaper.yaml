@@ -126,7 +126,6 @@ sensor:
 #    name: "$devicename Uptime Sensor"
 
   - platform: mqtt_subscribe
-    name: "AussenTemperatur"
     id: outside_temperature
     topic: esp32epaper/input/AussenTemperatur
     on_value:
@@ -135,7 +134,6 @@ sensor:
             id(valueCount) += 1;
 
   - platform: mqtt_subscribe
-    name: "AussenLuftfeuchte"
     id: sensorAussenLuftfeuchte
     topic: esp32epaper/input/AussenLuftfeuchte
     on_value:
@@ -144,7 +142,6 @@ sensor:
             id(valueCount) += 1;
 
   - platform: mqtt_subscribe
-    name: "Innentemperatur"
     id: inside_temperature
     topic: esp32epaper/input/InsideTemperature
     on_value:
@@ -154,7 +151,6 @@ sensor:
             id(valueCount) += 1;
 
   - platform: mqtt_subscribe
-    name: "Innen-Luftfeuchte"
     id: InsideHumidity
     topic: esp32epaper/input/InsideHumidity
     on_value:
@@ -335,7 +331,7 @@ display:
       y = 155, x = 102;
       if (id(inside_temperature).has_state()) {
         it.print(x, y, id(icon_font), TextAlign::BOTTOM_RIGHT, "ｱ");
-        it.printf(x+2, y, id(temp_font), TextAlign::BOTTOM_LEFT , "%5.1f°C", id(inside_temperature).state);
+        it.printf(x+2, y, id(temp_font), TextAlign::BOTTOM_LEFT , "%6.1f°C", id(inside_temperature).state);
         }
       if (id(InsideHumidity).has_state()) {
         it.printf(x+x+x, y, id(temp_font), TextAlign::BOTTOM_LEFT , "%3.0f%%", id(InsideHumidity).state);
@@ -343,7 +339,7 @@ display:
       // Print outside temperature (from homeassistant sensor)
       if (id(outside_temperature).has_state()) {
         it.print(x, y, id(icon_font), TextAlign::TOP_RIGHT, "ｲ"); 
-        it.printf(x+2, y, id(temp_font), TextAlign::TOP_LEFT, "%5.1f°C", id(outside_temperature).state);
+        it.printf(x+2, y, id(temp_font), TextAlign::TOP_LEFT, "%6.1f°C", id(outside_temperature).state);
       }
       if (id(sensorAussenLuftfeuchte).has_state()) {
         it.printf(x+x+x, y, id(temp_font), TextAlign::TOP_LEFT, "%3.0f%%", id(sensorAussenLuftfeuchte).state);
