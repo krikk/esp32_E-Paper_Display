@@ -215,6 +215,7 @@ font:
     glyphs: [
       '', # mdi-account-heart
       '', # mdi-thermometer
+      "", # mdi-water-percent
       '󰅢', # mdi-fire-hydrant
       "", # mdi-umbrella
       "ｲ", # mdi-home-thermometer-outline
@@ -327,7 +328,8 @@ display:
         it.printf(x+2, y, id(temp_font), TextAlign::BOTTOM_LEFT , "%6.1f°C", id(inside_temperature).state);
         }
       if (id(InsideHumidity).has_state()) {
-        it.printf(x+x+x, y, id(temp_font), TextAlign::BOTTOM_LEFT , "%3.0f%%", id(InsideHumidity).state);
+        it.printf(x+x+x, y, id(icon_font), TextAlign::BOTTOM_LEFT, ""); 
+        it.printf(x+x+x+x, y, id(temp_font), TextAlign::BOTTOM_LEFT , "%3.0f%%", id(InsideHumidity).state);
         }
       // Print outside temperature (from homeassistant sensor)
       if (id(outside_temperature).has_state()) {
