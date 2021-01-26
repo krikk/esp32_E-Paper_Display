@@ -49,13 +49,14 @@ esphome:
     then:
       - if:
           condition:
-            lambda: 'return (id(valueCount) == 6) ;'
+            lambda: 'return (id(valueCount) == 7) ;'
           then:
             - logger.log: "all values ready..."
             - lambda: 'id(valueCount) += 1;'
             - component.update: my_display
-            - delay: 7s
-            - logger.log: "delayed 7s..."
+            # - lambda: 'WiFi.mode(WIFI_OFF);'
+            - delay: 8s
+            - logger.log: "delayed 8s..."
             - deep_sleep.enter: deep_sleep_1
           # else:
             # - logger.log: "waiting for values..."
@@ -107,12 +108,12 @@ time:
 #    name: "$devicename Restart"
 
 text_sensor:
-
-
   - platform: mqtt_subscribe
-    id: moon_icon
-    topic: sensor.moon_tpl
-
+    id: moonPhase
+    topic: esp32epaper/input/MoonPhase
+    on_value:
+      then:
+        - lambda: 'id(valueCount) += 1;'
  
 uart:
   rx_pin: GPIO26
@@ -287,10 +288,10 @@ display:
       it.print(125, 182, id(temp_font), TextAlign::BASELINE_CENTER, "Lea & Emma"); // 400 - ((400 - 260)/2)
       */
       /* Moon icon */
-      if(id(moon_icon).has_state()) {
-        y = 155, x = 230;
-        ESP_LOGI("Moon icon", "%s", id(moon_icon).state.c_str());
-        it.printf(x, y, id(weather_font), TextAlign::BASELINE_CENTER, "%s", id(moon_icon).state.c_str());
+      if(id(moonPhase).has_state()) {
+        y = 355, x = 230;
+        ESP_LOGI("Moon icon", "%s", id(moonPhase).state.c_str());
+        it.printf(x, y, id(weather_font), TextAlign::BASELINE_CENTER, "%s", id(moonPhase).state.c_str());
       }
       /* WiFi Signal Strenght */
       if(id(wifisignal).has_state()) {
