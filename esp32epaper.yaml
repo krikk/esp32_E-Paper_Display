@@ -211,7 +211,7 @@ font:
        'u', 'v', 'w', 'x', 'y', 'z', 'å', 'ä', 'ö', '/']
   - file: 'fonts/materialdesignicons-webfont.ttf'
     id: icon_font
-    size: 55
+    size: 70
     glyphs: [
       '', # mdi-account-heart
       '', # mdi-thermometer
@@ -220,12 +220,17 @@ font:
       "", # mdi-umbrella
       "ｲ", # mdi-home-thermometer-outline
       "ｱ", # mdi-home-thermometer
-      # Wifi
-      '冷', # mdi-wifi-strength-outline
-      '爛', # mdi-wifi-strength-1
-      '嵐', # mdi-wifi-strength-2
-      '襤', # mdi-wifi-strength-3
-      '蠟', # mdi-wifi-strength-4
+      "", # sun rise
+      "", # sun set
+      "\U000F029A", # Pressure
+      "\U000F15FA", # Wind
+      "\U000F058C", # Rain
+      "\U000F0E02", # Tempmin
+      "\U000F0E03", # Tempmax
+      "\U000F0150", # Clock
+      
+      "", # wind
+      
       # Moon
       "ﾁ", # new_moon
       "ﾄ", # waxing_crecent
@@ -247,22 +252,15 @@ font:
       '', # mdi-thermometer
       '󰅢', # mdi-fire-hydrant
       "", # mdi-umbrella
-      "ｲ", # mdi-home-thermometer-outline
+      "ｲ", # mdi-home-thermometer-outline F0F55
+      
       # Wifi
       '冷', # mdi-wifi-strength-outline
       '爛', # mdi-wifi-strength-1
       '嵐', # mdi-wifi-strength-2
       '襤', # mdi-wifi-strength-3
       '蠟', # mdi-wifi-strength-4
-      # Moon
-      "ﾁ", # new_moon
-      "ﾄ", # waxing_crecent
-      "ｾ", # first_quarter
-      "ﾅ", # waxing_gibbous
-      "ｿ", # full_moon
-      "ﾃ", # waning_gibbous
-      "ﾀ", # last_quarter
-      "ﾂ", # waning_crescent
+
       ]
 
 display:
@@ -292,30 +290,30 @@ display:
       if(id(moonPhase).has_state()) {
         y = 355, x = 230;
         ESP_LOGI("Moon icon", "%s", id(moonPhase).state.c_str());
-        it.printf(x, y, id(weather_font), TextAlign::BASELINE_CENTER, "%s", id(moonPhase).state.c_str());
+        it.printf(x, y, id(icon_font), TextAlign::BASELINE_CENTER, "%s", id(moonPhase).state.c_str());
       }
       /* WiFi Signal Strenght */
       if(id(wifisignal).has_state()) {
         x = 798, y = 478;
         if (id(wifisignal).state >= -50) {
             //Excellent
-            it.print(x, y, id(icon_font), TextAlign::BOTTOM_RIGHT, "蠟");
+            it.print(x, y, id(weather_font), TextAlign::BOTTOM_RIGHT, "蠟");
             ESP_LOGI("WiFi", "Exellent");
         } else if (id(wifisignal).state  >= -60) {
             //Good
-            it.print(x, y, id(icon_font), TextAlign::BOTTOM_RIGHT, "襤");
+            it.print(x, y, id(weather_font), TextAlign::BOTTOM_RIGHT, "襤");
             ESP_LOGI("WiFi", "Good");
         } else if (id(wifisignal).state  >= -67) {
             //Fair
-            it.print(x, y, id(icon_font), TextAlign::BOTTOM_RIGHT, "嵐");
+            it.print(x, y, id(weather_font), TextAlign::BOTTOM_RIGHT, "嵐");
             ESP_LOGI("WiFi", "Fair");
         } else if (id(wifisignal).state  >= -70) {
             //Weak
-            it.print(x, y, id(icon_font), TextAlign::BOTTOM_RIGHT, "爛");
+            it.print(x, y, id(weather_font), TextAlign::BOTTOM_RIGHT, "爛");
             ESP_LOGI("WiFi", "Weak");
         } else {
             //Unlikely working signal
-            it.print(x, y, id(icon_font), TextAlign::BOTTOM_RIGHT, "冷");
+            it.print(x, y, id(weather_font), TextAlign::BOTTOM_RIGHT, "冷");
             ESP_LOGI("WiFi", "Unlikely");
         }
       }
@@ -328,8 +326,8 @@ display:
         it.printf(x+2, y, id(temp_font), TextAlign::BOTTOM_LEFT , "%6.1f°C", id(inside_temperature).state);
         }
       if (id(InsideHumidity).has_state()) {
-        it.printf(x+x+x, y, id(icon_font), TextAlign::BOTTOM_LEFT, ""); 
-        it.printf(x+x+x+x, y, id(temp_font), TextAlign::BOTTOM_LEFT , "%3.0f%%", id(InsideHumidity).state);
+        it.printf(x+x+x+x, y, id(icon_font), TextAlign::BOTTOM_LEFT, ""); 
+        it.printf(x+x+x+x+x/2, y, id(temp_font), TextAlign::BOTTOM_LEFT , "%3.0f%%", id(InsideHumidity).state);
         }
       // Print outside temperature (from homeassistant sensor)
       if (id(outside_temperature).has_state()) {
@@ -337,7 +335,8 @@ display:
         it.printf(x+2, y, id(temp_font), TextAlign::TOP_LEFT, "%6.1f°C", id(outside_temperature).state);
       }
       if (id(sensorAussenLuftfeuchte).has_state()) {
-        it.printf(x+x+x, y, id(temp_font), TextAlign::TOP_LEFT, "%3.0f%%", id(sensorAussenLuftfeuchte).state);
+        it.printf(x+x+x+x, y, id(icon_font), TextAlign::TOP_LEFT, ""); 
+        it.printf(x+x+x+x+x/2, y, id(temp_font), TextAlign::TOP_LEFT, "%3.0f%%", id(sensorAussenLuftfeuchte).state);
       }
       // Print consumer
       if (id(top_consumer).has_state()) {
