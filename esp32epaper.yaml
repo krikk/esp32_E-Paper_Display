@@ -55,8 +55,8 @@ esphome:
             - lambda: 'id(valueCount) += 1;'
             - component.update: my_display
             # - lambda: 'WiFi.mode(WIFI_OFF);'
-            - delay: 8s
-            - logger.log: "delayed 8s..."
+            - delay: 6s
+            - logger.log: "delayed 6s..."
             - if:
                 condition:
                   lambda: 'return id(prevent_sleep);'
