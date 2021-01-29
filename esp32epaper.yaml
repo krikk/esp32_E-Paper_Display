@@ -49,7 +49,7 @@ esphome:
     then:
       - if:
           condition:
-            lambda: 'return (id(valueCount) == 7) ;'
+            lambda: 'return (id(valueCount) == 8) ;'
           then:
             - logger.log: "all values ready..."
             - lambda: 'id(valueCount) += 1;'
@@ -57,7 +57,13 @@ esphome:
             # - lambda: 'WiFi.mode(WIFI_OFF);'
             - delay: 8s
             - logger.log: "delayed 8s..."
-            - deep_sleep.enter: deep_sleep_1
+            - if:
+                condition:
+                  lambda: 'return id(prevent_sleep);'
+                then:
+                  - logger.log: "OTA Mode"
+                else:
+                  - deep_sleep.enter: deep_sleep_1
           # else:
             # - logger.log: "waiting for values..."
 packages:
@@ -72,10 +78,6 @@ mqtt:
   discovery: false
   client_id: $devicename
   on_message: # Manueller refresh des Displays bei Änderung
-    - topic: $devicename/input/refresh_display
-      payload: "1"
-      then:
-        - component.update: my_display
     - topic: $devicename/input/ota_mode
       payload: '1'
       then:
@@ -83,6 +85,10 @@ mqtt:
             id: prevent_sleep
             value: 'true'
         - deep_sleep.prevent: deep_sleep_1
+    - topic: $devicename/input/refresh_display
+      payload: "1"
+      then:
+        - component.update: my_display
     - topic: $devicename/input/sleep_mode
       payload: '1'
       then:
@@ -155,7 +161,7 @@ sensor:
         - lambda: 'id(valueCount) += 1;'
 
   - platform: mqtt_subscribe
-    id: top_consumer
+    id: pvPower
     topic: esp32epaper/input/PVPower
     on_value:
       then:
@@ -164,7 +170,15 @@ sensor:
 
   - platform: mqtt_subscribe
     topic: esp32epaper/input/TotalPower
-    id: sparsnas
+    id: totalPower
+    on_value:
+      then:
+        - logger.log: "Value recieved..."
+        - lambda: 'id(valueCount) += 1;'
+
+  - platform: mqtt_subscribe
+    topic: esp32epaper/input/CO2
+    id: CO2
     on_value:
       then:
         - logger.log: "Value recieved..."
@@ -228,7 +242,8 @@ font:
       "\U000F0E02", # Tempmin
       "\U000F0E03", # Tempmax
       "\U000F0150", # Clock
-      
+      "\U0000F7E3", #mdi-periodic-table-co2
+      "\U0000FA71", #mdi-solar-power
       "", # wind
       
       # Moon
@@ -279,8 +294,6 @@ display:
       /* Print time in HH:MM format */
       it.strftime(125, -10, id(clock_font), TextAlign::TOP_CENTER, "%H:%M", id(current_time).now());
 
-      //it.line(259, -10, 259, 200);it.line(261, 0, 261, 200);it.line(260, 0, 260, 200);
-      //it.line(0, 200, 259, 200);it.line(0, 201, 261, 201);it.line(0, 202, 260, 202);
       /*
       it.print(125, 120, id(temp_font), TextAlign::BASELINE_CENTER, "HELLO SUNSHINE!");
       it.print(125, 160, id(icon_font), TextAlign::BASELINE_CENTER, "");
@@ -292,6 +305,9 @@ display:
         ESP_LOGI("Moon icon", "%s", id(moonPhase).state.c_str());
         it.printf(x, y, id(icon_font), TextAlign::BASELINE_CENTER, "%s", id(moonPhase).state.c_str());
       }
+      
+
+      
       /* WiFi Signal Strenght */
       if(id(wifisignal).has_state()) {
         x = 798, y = 478;
@@ -338,9 +354,21 @@ display:
         it.printf(x+x+x+x, y, id(icon_font), TextAlign::TOP_LEFT, ""); 
         it.printf(x+x+x+x+x/2, y, id(temp_font), TextAlign::TOP_LEFT, "%3.0f%%", id(sensorAussenLuftfeuchte).state);
       }
+      
+      /* CO2 icon */
+      if(id(CO2).has_state()) {
+        it.print(x+x+x+x, y+y, id(icon_font), TextAlign::TOP_LEFT, "\U0000F7E3"); 
+        it.printf(x+x+x+x+x/2, y+y, id(temp_font), TextAlign::TOP_LEFT, "%4.0f", id(CO2).state);
+      }
+      
       // Print consumer
-      if (id(top_consumer).has_state()) {
-        it.printf(0, 480, id(temp_font), TextAlign::BOTTOM_LEFT , "Verbr.: %.0f W, PV: %.0f W", id(sparsnas).state, id(top_consumer).state);
+      if (id(pvPower).has_state()) {
+        it.printf(0, 480, id(temp_font), TextAlign::BOTTOM_LEFT , "Verbr.: %4.0f W", id(totalPower).state);
+        it.print(400, 480, id(icon_font), TextAlign::BOTTOM_LEFT, "\U0000FA71");
+        it.printf(450, 480, id(temp_font), TextAlign::BOTTOM_LEFT , "%3.0f W", id(pvPower).state);
+        
+
+
       }
       // it.line(0, 299, 400, 299);
 
