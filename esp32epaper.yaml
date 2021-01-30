@@ -244,6 +244,7 @@ font:
       "\U000F0150", # Clock
       "\U0000F7E3", #mdi-periodic-table-co2
       "\U0000FA71", #mdi-solar-power
+      "\U0000F6A4",  #mdi-power-plug
       "", # wind
       
       # Moon
@@ -290,7 +291,6 @@ display:
     id: my_display
     lambda: |
       int x, y;
-      ESP_LOGI("display", "Updating..");
 
       /* Print time in HH:MM format */
       it.strftime(125, -10, id(clock_font), TextAlign::TOP_CENTER, "%H:%M", id(current_time).now());
@@ -359,7 +359,8 @@ display:
       
       // Print consumer
       if (id(pvPower).has_state()) {
-        it.printf(0, 480, id(temp_font), TextAlign::BOTTOM_LEFT , "Verbr.: %4.0f W", id(totalPower).state);
+        it.print(0, 480, id(icon_font), TextAlign::BOTTOM_LEFT, "\U0000F6A4");
+        it.printf(70, 480, id(temp_font), TextAlign::BOTTOM_LEFT , "%4.0f W", id(totalPower).state);
         it.print(400, 480, id(icon_font), TextAlign::BOTTOM_LEFT, "\U0000FA71");
         it.printf(470, 480, id(temp_font), TextAlign::BOTTOM_LEFT , "%3.0f W", id(pvPower).state);
         
