@@ -255,6 +255,7 @@ font:
       "ﾃ", # waning_gibbous
       "ﾀ", # last_quarter
       "ﾂ", # waning_crescent
+      "", # mdi-arrow-right
       # Sun
       "", # mdi-weather-sunset-down
       "", # mdi-weather-sunset-up
@@ -294,11 +295,6 @@ display:
       /* Print time in HH:MM format */
       it.strftime(125, -10, id(clock_font), TextAlign::TOP_CENTER, "%H:%M", id(current_time).now());
 
-      /*
-      it.print(125, 120, id(temp_font), TextAlign::BASELINE_CENTER, "HELLO SUNSHINE!");
-      it.print(125, 160, id(icon_font), TextAlign::BASELINE_CENTER, "");
-      it.print(125, 182, id(temp_font), TextAlign::BASELINE_CENTER, "Lea & Emma"); // 400 - ((400 - 260)/2)
-      */
       /* Moon icon */
       if(id(moonPhase).has_state()) {
         y = 355, x = 230;
@@ -365,7 +361,7 @@ display:
       if (id(pvPower).has_state()) {
         it.printf(0, 480, id(temp_font), TextAlign::BOTTOM_LEFT , "Verbr.: %4.0f W", id(totalPower).state);
         it.print(400, 480, id(icon_font), TextAlign::BOTTOM_LEFT, "\U0000FA71");
-        it.printf(450, 480, id(temp_font), TextAlign::BOTTOM_LEFT , "%3.0f W", id(pvPower).state);
+        it.printf(470, 480, id(temp_font), TextAlign::BOTTOM_LEFT , "%3.0f W", id(pvPower).state);
         
 
 
