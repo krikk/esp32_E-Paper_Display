@@ -246,6 +246,7 @@ font:
       "\U0000FA71", #mdi-solar-power
       "\U0000F6A4",  #mdi-power-plug
       "", # wind
+      "󰂕"; #mdi-bed-double-outline
       
       # Moon
       "ﾁ", # new_moon
