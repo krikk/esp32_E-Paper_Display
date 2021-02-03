@@ -49,7 +49,7 @@ esphome:
     then:
       - if:
           condition:
-            lambda: 'return (id(valueCount) == 8) ;'
+            lambda: 'return (id(valueCount) == 10) ;'
           then:
             - logger.log: "all values ready..."
             - lambda: 'id(valueCount) += 1;'
@@ -184,6 +184,22 @@ sensor:
         - logger.log: "Value recieved..."
         - lambda: 'id(valueCount) += 1;'
 
+  - platform: mqtt_subscribe
+    topic: esp32epaper/input/AussenTemperaturMin
+    id: AussenTemperaturMin
+    on_value:
+      then:
+        - logger.log: "Value recieved..."
+        - lambda: 'id(valueCount) += 1;'
+
+  - platform: mqtt_subscribe
+    topic: esp32epaper/input/AussenTemperaturMax
+    id: AussenTemperaturMax
+    on_value:
+      then:
+        - logger.log: "Value recieved..."
+        - lambda: 'id(valueCount) += 1;'
+
   - platform: wifi_signal
     name: "$devicename WiFi Signal Sensor"
     id: wifisignal
@@ -223,7 +239,10 @@ font:
        'T', 'U', 'V', 'W', 'X', 'Y', 'Z', ' ', 'a', 'b', 'c', 'd', 'e', 'f',
        'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't',
        'u', 'v', 'w', 'x', 'y', 'z', 'å', 'ä', 'ö', '/']
-  - file: 'fonts/materialdesignicons-webfont.ttf'
+       
+    # Preview: https://pictogrammers.github.io/@mdi/font/4.4.95/
+    # Download: https://cdnjs.com/libraries/MaterialDesign-Webfont
+  - file: 'fonts/materialdesignicons-webfont_4.4.95.ttf'
     id: icon_font
     size: 70
     glyphs: [
@@ -236,17 +255,11 @@ font:
       "ｱ", # mdi-home-thermometer
       "", # sun rise
       "", # sun set
-      "\U000F029A", # Pressure
-      "\U000F15FA", # Wind
-      "\U000F058C", # Rain
-      "\U000F0E02", # Tempmin
-      "\U000F0E03", # Tempmax
-      "\U000F0150", # Clock
       "\U0000F7E3", #mdi-periodic-table-co2
       "\U0000FA71", #mdi-solar-power
       "\U0000F6A4",  #mdi-power-plug
       "", # wind
-      "󰂕"; #mdi-bed-double-outline
+      "󰂕", #mdi-bed-double-outline
       
       # Moon
       "ﾁ", # new_moon
@@ -262,7 +275,7 @@ font:
       "", # mdi-weather-sunset-down
       "", # mdi-weather-sunset-up
       ]
-  - file: 'fonts/materialdesignicons-webfont.ttf'
+  - file: 'fonts/materialdesignicons-webfont_4.4.95.ttf'
     id: weather_font
     size: 50
     glyphs: [
@@ -280,6 +293,22 @@ font:
       '蠟', # mdi-wifi-strength-4
 
       ]
+
+  # Preview https://pictogrammers.github.io/@mdi/font/5.9.55/
+  # Download: https://cdnjs.com/libraries/MaterialDesign-Webfont
+  - file: 'fonts/materialdesignicons-webfont_5.9.55.ttf'
+    id: icon5955_font
+    size: 70
+    glyphs: [
+      '󰸂', # F0E02 mdi-thermometer-chevron-down Tempmin
+      '󰸃', # F0E03 mdi-thermometer-chevron-up Tempmax
+      '󰊚', # F029A mdi-gauge
+      '󱗺', # F15FA mdi-windsock
+      '󰖌', # F058C mdi-water
+      '󰅐', # F0150 mdi-clock-outline Clock      
+
+      ]
+
 
 display:
   - platform: waveshare_epaper
@@ -342,7 +371,7 @@ display:
         it.printf(x+x+x+x, y, id(icon_font), TextAlign::BOTTOM_LEFT, ""); 
         it.printf(x+x+x+x+x/2, y, id(temp_font), TextAlign::BOTTOM_LEFT , "%3.0f%%", id(InsideHumidity).state);
         }
-      // Print outside temperature (from homeassistant sensor)
+      // Print outside temperature 
       if (id(outside_temperature).has_state()) {
         it.print(x, y, id(icon_font), TextAlign::TOP_RIGHT, "ｲ"); 
         it.printf(x+2, y, id(temp_font), TextAlign::TOP_LEFT, "%6.1f°C", id(outside_temperature).state);
@@ -351,6 +380,19 @@ display:
         it.printf(x+x+x+x, y, id(icon_font), TextAlign::TOP_LEFT, ""); 
         it.printf(x+x+x+x+x/2, y, id(temp_font), TextAlign::TOP_LEFT, "%3.0f%%", id(sensorAussenLuftfeuchte).state);
       }
+
+      // Print outside min temperature 
+      if (id(AussenTemperaturMin).has_state()) {
+        it.print(x, 220, id(icon5955_font), TextAlign::TOP_RIGHT, "󰸂"); 
+        it.printf(x+2, 220, id(temp_font), TextAlign::TOP_LEFT, "%6.1f°C", id(AussenTemperaturMin).state);
+      }
+
+      // Print outside max temperature 
+      if (id(AussenTemperaturMax).has_state()) {
+        it.print(x+x+x+x, 220, id(icon5955_font), TextAlign::TOP_RIGHT, "󰸃"); 
+        it.printf(x+x+x+x+x/2, 220, id(temp_font), TextAlign::TOP_LEFT, "%6.1f°C", id(AussenTemperaturMax).state);
+      }
+
       
       /* CO2 icon */
       if(id(CO2).has_state()) {
