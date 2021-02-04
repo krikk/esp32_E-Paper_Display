@@ -212,9 +212,6 @@ spi:
 #  miso_pin: GPIO5
 
 font:
-  - file: "fonts/Roboto-Regular.ttf"
-    id: fontRoboto
-    size: 40
   - file: 'fonts/Google_Sans_Bold.ttf'
     id: clock_font
     size: 90
@@ -240,73 +237,60 @@ font:
        'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't',
        'u', 'v', 'w', 'x', 'y', 'z', 'å', 'ä', 'ö', '/']
        
-    # Preview: https://pictogrammers.github.io/@mdi/font/4.4.95/
-    # Download: https://cdnjs.com/libraries/MaterialDesign-Webfont
-  - file: 'fonts/materialdesignicons-webfont_4.4.95.ttf'
-    id: icon_font
-    size: 70
-    glyphs: [
-      '', # mdi-account-heart
-      '', # mdi-thermometer
-      "", # mdi-water-percent
-      '󰅢', # mdi-fire-hydrant
-      "", # mdi-umbrella
-      "ｲ", # mdi-home-thermometer-outline
-      "ｱ", # mdi-home-thermometer
-      "", # sun rise
-      "", # sun set
-      "\U0000F7E3", #mdi-periodic-table-co2
-      "\U0000FA71", #mdi-solar-power
-      "\U0000F6A4",  #mdi-power-plug
-      "", # wind
-      "󰂕", #mdi-bed-double-outline
-      
-      # Moon
-      "ﾁ", # new_moon
-      "ﾄ", # waxing_crecent
-      "ｾ", # first_quarter
-      "ﾅ", # waxing_gibbous
-      "ｿ", # full_moon
-      "ﾃ", # waning_gibbous
-      "ﾀ", # last_quarter
-      "ﾂ", # waning_crescent
-      "", # mdi-arrow-right
-      # Sun
-      "", # mdi-weather-sunset-down
-      "", # mdi-weather-sunset-up
-      ]
-  - file: 'fonts/materialdesignicons-webfont_4.4.95.ttf'
+  - file: 'fonts/materialdesignicons-webfont_5.9.55.ttf'
     id: weather_font
     size: 50
     glyphs: [
-      '', # mdi-account-heart
-      '', # mdi-thermometer
-      '󰅢', # mdi-fire-hydrant
-      "", # mdi-umbrella
-      "ｲ", # mdi-home-thermometer-outline F0F55
-      
-      # Wifi
-      '冷', # mdi-wifi-strength-outline
-      '爛', # mdi-wifi-strength-1
-      '嵐', # mdi-wifi-strength-2
-      '襤', # mdi-wifi-strength-3
-      '蠟', # mdi-wifi-strength-4
 
+      # Wifi
+      '󰤯', # F092F mdi-wifi-strength-outline
+      '󰤟', # F091F mdi-wifi-strength-1
+      '󰤢', # F0922 mdi-wifi-strength-2
+      '󰤥', # F0925 mdi-wifi-strength-3
+      '󰤨', # F0928 mdi-wifi-strength-4
       ]
 
   # Preview https://pictogrammers.github.io/@mdi/font/5.9.55/
   # Download: https://cdnjs.com/libraries/MaterialDesign-Webfont
   - file: 'fonts/materialdesignicons-webfont_5.9.55.ttf'
-    id: icon5955_font
+    id: icon_font
     size: 70
     glyphs: [
+      '󰢙', # F0899 mdi-account-heart
+      '󰔏', # F050F mdi-thermometer
       '󰸂', # F0E02 mdi-thermometer-chevron-down Tempmin
       '󰸃', # F0E03 mdi-thermometer-chevron-up Tempmax
+      '󱄷', # F1137 mdi-fire-hydrant
+      
+      '󰖎', # F058E mdi-water-percent
+      '󰕊', # F054A mdi-umbrella
+      '󰽕', # F0F55 mdi-home-thermometer-outline
+      '󰽔', # F0F54 mdi-home-thermometer
+      '󰟤', # F07E4 mdi-molecule-co2
+      '󰩲', # F0A72 mdi-solar-power
+      '󰚥', # F06A5 mdi-power-plug
+      '󰖝', # F059D mdi-weather-windy
+      '󰿓', # F0FD3 mdi-bed-double-outline
+
       '󰊚', # F029A mdi-gauge
       '󱗺', # F15FA mdi-windsock
       '󰖌', # F058C mdi-water
       '󰅐', # F0150 mdi-clock-outline Clock      
 
+      # Sun
+      '󰖛', # F059B mdi-weather-sunset-down
+      '󰖜', # F059C mdi-weather-sunset-up
+
+      # Moon
+      "󰽤", # F0F64 mdi-moon-new new_moon
+      "󰽧", # F0F67 mdi-moon-waxing-crescent waxing_crecent
+      "󰽡", # F0F61 mdi-moon-first-quarter first_quarter
+      "󰽨", # F0F68 mdi-moon-waxing-gibbous waxing_gibbous
+      "󰽢", # F0F62 mdi-moon-full full_moon
+      "󰽦", # F0F66 mdi-moon-waning-gibbous waning_gibbous
+      "󰽣", # F0F63 mdi-moon-last-quarter last_quarter
+      "󰽥", # F0F65 mdi-moon-waning-crescent waning_crescent
+      "󰁔", # F0054 mdi-arrow-right
       ]
 
 
@@ -339,23 +323,23 @@ display:
         x = 798, y = 478;
         if (id(wifisignal).state >= -50) {
             //Excellent
-            it.print(x, y, id(weather_font), TextAlign::BOTTOM_RIGHT, "蠟");
+            it.print(x, y, id(weather_font), TextAlign::BOTTOM_RIGHT, "󰤨");
             ESP_LOGI("WiFi", "Exellent");
         } else if (id(wifisignal).state  >= -60) {
             //Good
-            it.print(x, y, id(weather_font), TextAlign::BOTTOM_RIGHT, "襤");
+            it.print(x, y, id(weather_font), TextAlign::BOTTOM_RIGHT, "󰤥");
             ESP_LOGI("WiFi", "Good");
         } else if (id(wifisignal).state  >= -67) {
             //Fair
-            it.print(x, y, id(weather_font), TextAlign::BOTTOM_RIGHT, "嵐");
+            it.print(x, y, id(weather_font), TextAlign::BOTTOM_RIGHT, "󰤢");
             ESP_LOGI("WiFi", "Fair");
         } else if (id(wifisignal).state  >= -70) {
             //Weak
-            it.print(x, y, id(weather_font), TextAlign::BOTTOM_RIGHT, "爛");
+            it.print(x, y, id(weather_font), TextAlign::BOTTOM_RIGHT, "󰤟");
             ESP_LOGI("WiFi", "Weak");
         } else {
             //Unlikely working signal
-            it.print(x, y, id(weather_font), TextAlign::BOTTOM_RIGHT, "冷");
+            it.print(x, y, id(weather_font), TextAlign::BOTTOM_RIGHT, "󰤯");
             ESP_LOGI("WiFi", "Unlikely");
         }
       }
@@ -364,47 +348,47 @@ display:
       // Print inside temperature (from homeassistant sensor)
       y = 155, x = 102;
       if (id(inside_temperature).has_state()) {
-        it.print(x, y, id(icon_font), TextAlign::BOTTOM_RIGHT, "ｱ");
+        it.print(x, y, id(icon_font), TextAlign::BOTTOM_RIGHT, "󰽔");
         it.printf(x+2, y, id(temp_font), TextAlign::BOTTOM_LEFT , "%6.1f°C", id(inside_temperature).state);
         }
       if (id(InsideHumidity).has_state()) {
-        it.printf(x+x+x+x, y, id(icon_font), TextAlign::BOTTOM_LEFT, ""); 
+        it.printf(x+x+x+x, y, id(icon_font), TextAlign::BOTTOM_LEFT, "󰖎"); 
         it.printf(x+x+x+x+x/2, y, id(temp_font), TextAlign::BOTTOM_LEFT , "%3.0f%%", id(InsideHumidity).state);
         }
       // Print outside temperature 
       if (id(outside_temperature).has_state()) {
-        it.print(x, y, id(icon_font), TextAlign::TOP_RIGHT, "ｲ"); 
+        it.print(x, y, id(icon_font), TextAlign::TOP_RIGHT, "󰽕"); 
         it.printf(x+2, y, id(temp_font), TextAlign::TOP_LEFT, "%6.1f°C", id(outside_temperature).state);
       }
       if (id(sensorAussenLuftfeuchte).has_state()) {
-        it.printf(x+x+x+x, y, id(icon_font), TextAlign::TOP_LEFT, ""); 
+        it.printf(x+x+x+x, y, id(icon_font), TextAlign::TOP_LEFT, "󰖎"); 
         it.printf(x+x+x+x+x/2, y, id(temp_font), TextAlign::TOP_LEFT, "%3.0f%%", id(sensorAussenLuftfeuchte).state);
       }
 
       // Print outside min temperature 
       if (id(AussenTemperaturMin).has_state()) {
-        it.print(x, 220, id(icon5955_font), TextAlign::TOP_RIGHT, "󰸂"); 
+        it.print(x, 220, id(icon_font), TextAlign::TOP_RIGHT, "󰸂"); 
         it.printf(x+2, 220, id(temp_font), TextAlign::TOP_LEFT, "%6.1f°C", id(AussenTemperaturMin).state);
       }
 
       // Print outside max temperature 
       if (id(AussenTemperaturMax).has_state()) {
-        it.print(x+x+x+x, 220, id(icon5955_font), TextAlign::TOP_RIGHT, "󰸃"); 
+        it.print(x+x+x+x, 220, id(icon_font), TextAlign::TOP_RIGHT, "󰸃"); 
         it.printf(x+x+x+x+x/2, 220, id(temp_font), TextAlign::TOP_LEFT, "%6.1f°C", id(AussenTemperaturMax).state);
       }
 
       
       /* CO2 icon */
       if(id(CO2).has_state()) {
-        it.print(x+x+x+x, y+y, id(icon_font), TextAlign::TOP_LEFT, "\U0000F7E3"); 
+        it.print(x+x+x+x, y+y, id(icon_font), TextAlign::TOP_LEFT, "󰟤"); 
         it.printf(x+x+x+x+x/2, y+y, id(temp_font), TextAlign::TOP_LEFT, "%4.0f", id(CO2).state);
       }
       
       // Print consumer
       if (id(pvPower).has_state()) {
-        it.print(0, 480, id(icon_font), TextAlign::BOTTOM_LEFT, "\U0000F6A4");
+        it.print(0, 480, id(icon_font), TextAlign::BOTTOM_LEFT, "󰚥");
         it.printf(70, 480, id(temp_font), TextAlign::BOTTOM_LEFT , "%4.0f W", id(totalPower).state);
-        it.print(400, 480, id(icon_font), TextAlign::BOTTOM_LEFT, "\U0000FA71");
+        it.print(400, 480, id(icon_font), TextAlign::BOTTOM_LEFT, "󰩲");
         it.printf(470, 480, id(temp_font), TextAlign::BOTTOM_LEFT , "%3.0f W", id(pvPower).state);
         
 
