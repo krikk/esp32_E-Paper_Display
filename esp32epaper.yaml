@@ -282,14 +282,15 @@ font:
       '󰖜', # F059C mdi-weather-sunset-up
 
       # Moon
-      "󰽤", # F0F64 mdi-moon-new new_moon
-      "󰽧", # F0F67 mdi-moon-waxing-crescent waxing_crecent
-      "󰽡", # F0F61 mdi-moon-first-quarter first_quarter
-      "󰽨", # F0F68 mdi-moon-waxing-gibbous waxing_gibbous
-      "󰽢", # F0F62 mdi-moon-full full_moon
-      "󰽦", # F0F66 mdi-moon-waning-gibbous waning_gibbous
-      "󰽣", # F0F63 mdi-moon-last-quarter last_quarter
-      "󰽥", # F0F65 mdi-moon-waning-crescent waning_crescent
+      "󰽢", # F0F64 mdi-moon-new new_moon
+      "󰽦", # F0F67 mdi-moon-waxing-crescent waxing_crecent
+      "󰽣", # F0F61 mdi-moon-first-quarter first_quarter
+      "󰽥", # F0F68 mdi-moon-waxing-gibbous waxing_gibbous
+      "󰽤", # F0F62 mdi-moon-full full_moon
+      "󰽧", # F0F66 mdi-moon-waning-gibbous waning_gibbous
+      "󰽡", # F0F63 mdi-moon-last-quarter last_quarter
+      "󰽨", # F0F65 mdi-moon-waning-crescent waning_crescent
+
       "󰁔", # F0054 mdi-arrow-right
       ]
 
