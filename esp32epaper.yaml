@@ -217,7 +217,16 @@ font:
     size: 90
     glyphs: [0, 1, 2, 3, 4, 5, 6, 7 ,8, 9, ':']
   - file: 'fonts/Google_Sans_Medium.ttf'
-    id: temp_font
+    id: font_100
+    size: 100
+  - file: 'fonts/Google_Sans_Medium.ttf'
+    id: font_30
+    size: 30
+  - file: 'fonts/Google_Sans_Medium.ttf'
+    id: font_40
+    size: 40
+  - file: 'fonts/Google_Sans_Medium.ttf'
+    id: font_55
     size: 55
     glyphs:
       ['&', '@', '!', ',', '.', '"', '%', '(', ')', '+', '-', '_', ':', '°', '0',
@@ -294,6 +303,21 @@ font:
       "󰁔", # F0054 mdi-arrow-right
       ]
 
+  - file: 'fonts/materialdesignicons-webfont_5.9.55.ttf'
+    id: icon_40
+    size: 40
+    glyphs: [
+      '󰸂', # F0E02 mdi-thermometer-chevron-down Tempmin
+      '󰸃', # F0E03 mdi-thermometer-chevron-up Tempmax
+      ]
+
+  - file: 'fonts/materialdesignicons-webfont_5.9.55.ttf'
+    id: icon_55
+    size: 55
+    glyphs: [
+      '󰖎', # F058E mdi-water-percent
+      ]
+
 
 display:
   - platform: waveshare_epaper
@@ -350,47 +374,47 @@ display:
       y = 155, x = 102;
       if (id(inside_temperature).has_state()) {
         it.print(x, y, id(icon_font), TextAlign::BOTTOM_RIGHT, "󰽔");
-        it.printf(x+2, y, id(temp_font), TextAlign::BOTTOM_LEFT , "%6.1f°C", id(inside_temperature).state);
+        it.printf(x+2, y, id(font_55), TextAlign::BOTTOM_LEFT , "%2.1f°C", id(inside_temperature).state);
         }
       if (id(InsideHumidity).has_state()) {
-        it.printf(x+x+x+x, y, id(icon_font), TextAlign::BOTTOM_LEFT, "󰖎"); 
-        it.printf(x+x+x+x+x/2, y, id(temp_font), TextAlign::BOTTOM_LEFT , "%3.0f%%", id(InsideHumidity).state);
+        it.printf(400, 200, id(icon_font), TextAlign::CENTER_LEFT, "󰖎"); 
+        it.printf(450, 200, id(font_55), TextAlign::CENTER_LEFT , "%2.0f%%", id(InsideHumidity).state);
         }
       // Print outside temperature 
       if (id(outside_temperature).has_state()) {
-        it.print(x, y, id(icon_font), TextAlign::TOP_RIGHT, "󰽕"); 
-        it.printf(x+2, y, id(temp_font), TextAlign::TOP_LEFT, "%6.1f°C", id(outside_temperature).state);
+        it.print(400, 0, id(font_30), TextAlign::TOP_LEFT, "OUT:"); 
+        it.printf(800, -19, id(font_100), TextAlign::TOP_RIGHT, "%2.1f°C", id(outside_temperature).state);
       }
       if (id(sensorAussenLuftfeuchte).has_state()) {
-        it.printf(x+x+x+x, y, id(icon_font), TextAlign::TOP_LEFT, "󰖎"); 
-        it.printf(x+x+x+x+x/2, y, id(temp_font), TextAlign::TOP_LEFT, "%3.0f%%", id(sensorAussenLuftfeuchte).state);
+        it.printf(812, 200, id(icon_55), TextAlign::CENTER_RIGHT, "󰖎"); 
+        it.printf(766, 200, id(font_55), TextAlign::CENTER_RIGHT, "%2.0f", id(sensorAussenLuftfeuchte).state);
       }
 
       // Print outside min temperature 
       if (id(AussenTemperaturMin).has_state()) {
-        it.print(x, 220, id(icon_font), TextAlign::TOP_RIGHT, "󰸂"); 
-        it.printf(x+2, 220, id(temp_font), TextAlign::TOP_LEFT, "%6.1f°C", id(AussenTemperaturMin).state);
+        it.print(400, 120, id(icon_40), TextAlign::CENTER_LEFT, "󰸂"); 
+        it.printf(440, 120, id(font_40), TextAlign::CENTER_LEFT, "%2.1f°C", id(AussenTemperaturMin).state);
       }
 
       // Print outside max temperature 
       if (id(AussenTemperaturMax).has_state()) {
-        it.print(x+x+x+x, 220, id(icon_font), TextAlign::TOP_RIGHT, "󰸃"); 
-        it.printf(x+x+x+x+x/2, 220, id(temp_font), TextAlign::TOP_LEFT, "%6.1f°C", id(AussenTemperaturMax).state);
+        it.print(678, 120, id(icon_40), TextAlign::CENTER_RIGHT, "󰸃"); 
+        it.printf(800, 120, id(font_40), TextAlign::CENTER_RIGHT, "%2.1f°C", id(AussenTemperaturMax).state);
       }
 
       
       /* CO2 icon */
       if(id(CO2).has_state()) {
         it.print(x+x+x+x, y+y, id(icon_font), TextAlign::TOP_LEFT, "󰟤"); 
-        it.printf(x+x+x+x+x/2, y+y, id(temp_font), TextAlign::TOP_LEFT, "%4.0f", id(CO2).state);
+        it.printf(x+x+x+x+x/2, y+y, id(font_55), TextAlign::TOP_LEFT, "%4.0f", id(CO2).state);
       }
       
       // Print consumer
       if (id(pvPower).has_state()) {
-        it.print(0, 480, id(icon_font), TextAlign::BOTTOM_LEFT, "󰚥");
-        it.printf(45, 480, id(temp_font), TextAlign::BOTTOM_LEFT , "%4.0f W", id(totalPower).state);
-        it.print(640, 480, id(icon_font), TextAlign::BOTTOM_RIGHT, "󰩲");
-        it.printf(800, 480, id(temp_font), TextAlign::BOTTOM_RIGHT , "%3.0f W", id(pvPower).state);
+        it.print(-13, 480, id(icon_font), TextAlign::BOTTOM_LEFT, "󰚥");
+        it.printf(45, 480, id(font_55), TextAlign::BOTTOM_LEFT , "%4.0f W", id(totalPower).state);
+        it.print(645, 480, id(icon_font), TextAlign::BOTTOM_RIGHT, "󰩲");
+        it.printf(800, 480, id(font_55), TextAlign::BOTTOM_RIGHT , "%3.0f W", id(pvPower).state);
         
 
 
