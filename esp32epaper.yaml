@@ -49,7 +49,7 @@ esphome:
     then:
       - if:
           condition:
-            lambda: 'return (id(valueCount) == 10) ;'
+            lambda: 'return (id(valueCount) == 11) ;'
           then:
             - logger.log: "all values ready..."
             - lambda: 'id(valueCount) += 1;'
@@ -200,6 +200,14 @@ sensor:
         - logger.log: "Value recieved..."
         - lambda: 'id(valueCount) += 1;'
 
+  - platform: mqtt_subscribe
+    topic: esp32epaper/input/Wind
+    id: wind
+    on_value:
+      then:
+        - logger.log: "Value recieved..."
+        - lambda: 'id(valueCount) += 1;'
+
   - platform: wifi_signal
     name: "$devicename WiFi Signal Sensor"
     id: wifisignal
@@ -222,6 +230,10 @@ font:
   - file: 'fonts/Google_Sans_Medium.ttf'
     id: font_30
     size: 30
+  - file: 'fonts/Google_Sans_Medium.ttf'
+    id: font_14
+    size: 14
+    glyphs: [k, m, /, h, p]
   - file: 'fonts/Google_Sans_Medium.ttf'
     id: font_40
     size: 40
@@ -262,7 +274,7 @@ font:
   # Preview https://pictogrammers.github.io/@mdi/font/5.9.55/
   # Download: https://cdnjs.com/libraries/MaterialDesign-Webfont
   - file: 'fonts/materialdesignicons-webfont_5.9.55.ttf'
-    id: icon_font
+    id: icon_70
     size: 70
     glyphs: [
       '󰢙', # F0899 mdi-account-heart
@@ -301,7 +313,15 @@ font:
       "󰽨", # F0F65 mdi-moon-waning-crescent waning_crescent
 
       "󰁔", # F0054 mdi-arrow-right
+      
+      # room icons
+      '󱕭', # F156D mdi-sofa-outline
+      '󰗲', # F05F2 mdi-food-fork-drink
+      '󰿑', # F0FD1 mdi-bed-king-outline
+      '󰙍', # F064D mdi-human-male
+      '󰙉', # F0649 mdi-human-female
       ]
+
 
   - file: 'fonts/materialdesignicons-webfont_5.9.55.ttf'
     id: icon_40
@@ -336,9 +356,8 @@ display:
 
       /* Moon icon */
       if(id(moonPhase).has_state()) {
-        y = 355, x = 230;
-        ESP_LOGI("Moon icon", "%s", id(moonPhase).state.c_str());
-        it.printf(x, y, id(icon_font), TextAlign::BASELINE_CENTER, "%s", id(moonPhase).state.c_str());
+         //ESP_LOGI("Moon icon", "%s", id(moonPhase).state.c_str());
+        it.printf(800, 360, id(icon_70), TextAlign::CENTER_RIGHT, "%s", id(moonPhase).state.c_str());
       }
       
 
@@ -370,16 +389,40 @@ display:
       }
 
 
-      // Print inside temperature (from homeassistant sensor)
-      y = 155, x = 102;
+      // Print inside temperature
       if (id(inside_temperature).has_state()) {
-        it.print(x, y, id(icon_font), TextAlign::BOTTOM_RIGHT, "󰽔");
-        it.printf(x+2, y, id(font_55), TextAlign::BOTTOM_LEFT , "%2.1f°C", id(inside_temperature).state);
+        it.print(0, 40, id(icon_70), TextAlign::CENTER_LEFT, "󱕭");
+        it.printf(90, 40, id(font_55), TextAlign::CENTER_LEFT , "%2.1f°C", id(inside_temperature).state);
         }
       if (id(InsideHumidity).has_state()) {
-        it.printf(400, 200, id(icon_font), TextAlign::CENTER_LEFT, "󰖎"); 
-        it.printf(450, 200, id(font_55), TextAlign::CENTER_LEFT , "%2.0f%%", id(InsideHumidity).state);
+        it.printf(400, 40, id(icon_55), TextAlign::CENTER_RIGHT, "󰖎"); 
+        it.printf(355, 40, id(font_55), TextAlign::CENTER_RIGHT , "%2.0f", id(InsideHumidity).state);
         }
+
+      // kitchen
+      //if (id(kitchen_temp).has_state()) {
+        it.print(0, 120, id(icon_70), TextAlign::CENTER_LEFT, "󰗲");
+        //it.printf(90, 40, id(font_55), TextAlign::CENTER_LEFT , "%2.1f°C", id(inside_temperature).state);
+        //}
+
+      // bedroom
+      //if (id(kitchen_temp).has_state()) {
+        it.print(0, 200, id(icon_70), TextAlign::CENTER_LEFT, "󰿑");
+        //it.printf(90, 40, id(font_55), TextAlign::CENTER_LEFT , "%2.1f°C", id(inside_temperature).state);
+        //}
+
+      // boys-room
+      //if (id(kitchen_temp).has_state()) {
+        it.print(0, 280, id(icon_70), TextAlign::CENTER_LEFT, "󰙍");
+        //it.printf(90, 40, id(font_55), TextAlign::CENTER_LEFT , "%2.1f°C", id(inside_temperature).state);
+        //}
+
+      // girl-room
+      //if (id(kitchen_temp).has_state()) {
+        it.print(0, 360, id(icon_70), TextAlign::CENTER_LEFT, "󰙉");
+        //it.printf(90, 40, id(font_55), TextAlign::CENTER_LEFT , "%2.1f°C", id(inside_temperature).state);
+        //}
+
       // Print outside temperature 
       if (id(outside_temperature).has_state()) {
         it.print(400, 0, id(font_30), TextAlign::TOP_LEFT, "OUT:"); 
@@ -402,18 +445,25 @@ display:
         it.printf(800, 120, id(font_40), TextAlign::CENTER_RIGHT, "%2.1f°C", id(AussenTemperaturMax).state);
       }
 
-      
       /* CO2 icon */
       if(id(CO2).has_state()) {
-        it.print(x+x+x+x, y+y, id(icon_font), TextAlign::TOP_LEFT, "󰟤"); 
-        it.printf(x+x+x+x+x/2, y+y, id(font_55), TextAlign::TOP_LEFT, "%4.0f", id(CO2).state);
+        it.print(666, 280, id(icon_70), TextAlign::CENTER_RIGHT, "󰟤"); 
+        it.printf(773, 280, id(font_55), TextAlign::CENTER_RIGHT, "%4.0f", id(CO2).state);
+        it.printf(800, 300, id(font_14), TextAlign::BASELINE_RIGHT, "ppm");
+      }
+      
+      /* wind */
+      if(id(wind).has_state()) {
+        it.print(400, 280, id(icon_70), TextAlign::CENTER_LEFT, "󱗺"); 
+        it.printf(525, 280, id(font_55), TextAlign::CENTER_RIGHT, "%2.0f", id(wind).state);
+        it.printf(525, 280, id(font_14), TextAlign::CENTER_LEFT, "km/h");
       }
       
       // Print consumer
       if (id(pvPower).has_state()) {
-        it.print(-13, 480, id(icon_font), TextAlign::BOTTOM_LEFT, "󰚥");
+        it.print(-13, 480, id(icon_70), TextAlign::BOTTOM_LEFT, "󰚥");
         it.printf(45, 480, id(font_55), TextAlign::BOTTOM_LEFT , "%4.0f W", id(totalPower).state);
-        it.print(645, 480, id(icon_font), TextAlign::BOTTOM_RIGHT, "󰩲");
+        it.print(645, 480, id(icon_70), TextAlign::BOTTOM_RIGHT, "󰩲");
         it.printf(800, 480, id(font_55), TextAlign::BOTTOM_RIGHT , "%3.0f W", id(pvPower).state);
         
 
