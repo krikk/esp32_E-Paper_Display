@@ -55,6 +55,8 @@ esphome:
             - lambda: 'id(valueCount) += 1;'
             - component.update: my_display
             # - lambda: 'WiFi.mode(WIFI_OFF);'
+            - component.update: wifisignal
+            - component.update: battery
             - delay: 6s
             - logger.log: "delayed 6s..."
             - if:
@@ -79,18 +81,18 @@ mqtt:
   client_id: $devicename
   on_message: # Manueller refresh des Displays bei Änderung
     - topic: $devicename/input/ota_mode
-      payload: '1'
+      payload: 'ON'
       then:
         - globals.set:
             id: prevent_sleep
             value: 'true'
         - deep_sleep.prevent: deep_sleep_1
     - topic: $devicename/input/refresh_display
-      payload: "1"
+      payload: 'ON'
       then:
         - component.update: my_display
     - topic: $devicename/input/sleep_mode
-      payload: '1'
+      payload: 'ON'
       then:
         - deep_sleep.enter: deep_sleep_1
 
@@ -119,7 +121,7 @@ text_sensor:
     topic: esp32epaper/input/MoonPhase
     on_value:
       then:
-        - lambda: 'id(valueCount) += 1;'
+        - lambda: 'id(valueCount) += 1; ESP_LOGD("main", "Value %i received" , id(valueCount));'
  
 uart:
   rx_pin: GPIO26
@@ -135,84 +137,82 @@ sensor:
     topic: esp32epaper/input/AussenTemperatur
     on_value:
       then:
-        - lambda: 'id(valueCount) += 1;'
+        - lambda: 'id(valueCount) += 1; ESP_LOGD("main", "Value %i received" , id(valueCount));'
 
   - platform: mqtt_subscribe
     id: sensorAussenLuftfeuchte
     topic: esp32epaper/input/AussenLuftfeuchte
     on_value:
       then:
-        - lambda: 'id(valueCount) += 1;'
+        - lambda: 'id(valueCount) += 1; ESP_LOGD("main", "Value %i received" , id(valueCount));'
 
   - platform: mqtt_subscribe
     id: inside_temperature
     topic: esp32epaper/input/InsideTemperature
     on_value:
       then:
-        - logger.log: "Value recieved..."
-        - lambda: 'id(valueCount) += 1;'
+        - lambda: 'id(valueCount) += 1; ESP_LOGD("main", "Value %i received" , id(valueCount));'
 
   - platform: mqtt_subscribe
     id: InsideHumidity
     topic: esp32epaper/input/InsideHumidity
     on_value:
       then:
-        - logger.log: "Value recieved..."
-        - lambda: 'id(valueCount) += 1;'
+        - lambda: 'id(valueCount) += 1; ESP_LOGD("main", "Value %i received" , id(valueCount));'
 
   - platform: mqtt_subscribe
     id: pvPower
     topic: esp32epaper/input/PVPower
     on_value:
       then:
-        - logger.log: "Value recieved..."
-        - lambda: 'id(valueCount) += 1;'
+        - lambda: 'id(valueCount) += 1; ESP_LOGD("main", "Value %i received" , id(valueCount));'
 
   - platform: mqtt_subscribe
     topic: esp32epaper/input/TotalPower
     id: totalPower
     on_value:
       then:
-        - logger.log: "Value recieved..."
-        - lambda: 'id(valueCount) += 1;'
+        - lambda: 'id(valueCount) += 1; ESP_LOGD("main", "Value %i received" , id(valueCount));'
 
   - platform: mqtt_subscribe
     topic: esp32epaper/input/CO2
     id: CO2
     on_value:
       then:
-        - logger.log: "Value recieved..."
-        - lambda: 'id(valueCount) += 1;'
+        - lambda: 'id(valueCount) += 1; ESP_LOGD("main", "Value %i received" , id(valueCount));'
 
   - platform: mqtt_subscribe
     topic: esp32epaper/input/AussenTemperaturMin
     id: AussenTemperaturMin
     on_value:
       then:
-        - logger.log: "Value recieved..."
-        - lambda: 'id(valueCount) += 1;'
+        - lambda: 'id(valueCount) += 1; ESP_LOGD("main", "Value %i received" , id(valueCount));'
 
   - platform: mqtt_subscribe
     topic: esp32epaper/input/AussenTemperaturMax
     id: AussenTemperaturMax
     on_value:
       then:
-        - logger.log: "Value recieved..."
-        - lambda: 'id(valueCount) += 1;'
+        - lambda: 'id(valueCount) += 1; ESP_LOGD("main", "Value %i received" , id(valueCount));'
 
   - platform: mqtt_subscribe
     topic: esp32epaper/input/Wind
     id: wind
     on_value:
       then:
-        - logger.log: "Value recieved..."
-        - lambda: 'id(valueCount) += 1;'
+        - lambda: 'id(valueCount) += 1; ESP_LOGD("main", "Value %i received" , id(valueCount));'
 
   - platform: wifi_signal
     name: "$devicename WiFi Signal Sensor"
     id: wifisignal
-    update_interval: 5min
+    update_interval: never
 
+  - platform: adc
+    pin: GPIO34
+    attenuation: 11db
+    id: battery
+    name: "Battery Voltage"
+    update_interval: never
 
 spi:
   clk_pin: GPIO19
