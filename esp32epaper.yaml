@@ -53,10 +53,10 @@ esphome:
           then:
             - logger.log: "all values ready..."
             - lambda: 'id(valueCount) += 1;'
-            - component.update: my_display
-            # - lambda: 'WiFi.mode(WIFI_OFF);'
             - component.update: wifisignal
             - component.update: battery
+            - component.update: my_display
+            # - lambda: 'WiFi.mode(WIFI_OFF);'
             - delay: 6s
             - logger.log: "delayed 6s..."
             - if:
@@ -81,18 +81,18 @@ mqtt:
   client_id: $devicename
   on_message: # Manueller refresh des Displays bei Änderung
     - topic: $devicename/input/ota_mode
-      payload: 'ON'
+      payload: '1'
       then:
         - globals.set:
             id: prevent_sleep
             value: 'true'
         - deep_sleep.prevent: deep_sleep_1
     - topic: $devicename/input/refresh_display
-      payload: 'ON'
+      payload: '1'
       then:
         - component.update: my_display
     - topic: $devicename/input/sleep_mode
-      payload: 'ON'
+      payload: '1'
       then:
         - deep_sleep.enter: deep_sleep_1
 
@@ -257,7 +257,9 @@ font:
        'T', 'U', 'V', 'W', 'X', 'Y', 'Z', ' ', 'a', 'b', 'c', 'd', 'e', 'f',
        'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't',
        'u', 'v', 'w', 'x', 'y', 'z', 'å', 'ä', 'ö', '/']
-       
+
+  # Preview https://pictogrammers.github.io/@mdi/font/5.9.55/
+  # Download: https://cdnjs.com/libraries/MaterialDesign-Webfont       
   - file: 'fonts/materialdesignicons-webfont_5.9.55.ttf'
     id: weather_font
     size: 50
@@ -269,6 +271,18 @@ font:
       '󰤢', # F0922 mdi-wifi-strength-2
       '󰤥', # F0925 mdi-wifi-strength-3
       '󰤨', # F0928 mdi-wifi-strength-4
+      
+      # Battery
+      '󰁺', # F007A mdi-battery-10
+      '󰁻', # F007B mdi-battery-20
+      '󰁼', # F007C mdi-battery-30
+      '󰁽', # F007D mdi-battery-40
+      '󰁾', # F007E mdi-battery-50
+      '󰁿', # F007F mdi-battery-60
+      '󰂀', # F0080 mdi-battery-70
+      '󰂁', # F0081 mdi-battery-80
+      '󰂂', # F0082 mdi-battery-90
+      '󰁹', # F0079 mdi-battery 100
       ]
 
   # Preview https://pictogrammers.github.io/@mdi/font/5.9.55/
@@ -388,6 +402,41 @@ display:
         }
       }
 
+      /* Battery Voltage */
+      if(id(battery).has_state()) {
+        x = 460, y = 400;
+        if (id(battery).state >= 3.3) {
+            // 100 %
+            it.print(x, y, id(weather_font), TextAlign::BOTTOM_LEFT, "󰁹");
+        } else if (id(battery).state  >= 3.13) {
+            // 90 %
+            it.print(x, y, id(weather_font), TextAlign::BOTTOM_LEFT, "󰂂");
+        } else if (id(battery).state  >= 2.96) {
+            // 80%
+            it.print(x, y, id(weather_font), TextAlign::BOTTOM_LEFT, "󰂁");
+        } else if (id(battery).state  >= 2.79) {
+            // 70%
+            it.print(x, y, id(weather_font), TextAlign::BOTTOM_LEFT, "󰂀");
+        } else if (id(battery).state  >= 2.62) {
+            // 60%
+            it.print(x, y, id(weather_font), TextAlign::BOTTOM_LEFT, "󰁿");
+        } else if (id(battery).state  >= 2.45) {
+            // 50%
+            it.print(x, y, id(weather_font), TextAlign::BOTTOM_LEFT, "󰁾");
+        } else if (id(battery).state  >= 2.28) {
+            // 40%
+            it.print(x, y, id(weather_font), TextAlign::BOTTOM_LEFT, "󰁽");
+        } else if (id(battery).state  >= 2.11) {
+            // 30%
+            it.print(x, y, id(weather_font), TextAlign::BOTTOM_LEFT, "󰁼");
+        } else if (id(battery).state  >= 1.94) {
+            // 20%
+            it.print(x, y, id(weather_font), TextAlign::BOTTOM_LEFT, "󰁻");
+        } else {
+            // 10%
+            it.print(x, y, id(weather_font), TextAlign::BOTTOM_LEFT, "󰁺");
+        }
+      }
 
       // Print inside temperature
       if (id(inside_temperature).has_state()) {
