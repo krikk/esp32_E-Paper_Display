@@ -53,8 +53,8 @@ esphome:
           then:
             - logger.log: "all values ready..."
             - lambda: 'id(valueCount) += 1;'
-            - component.update: wifisignal
-            - component.update: battery
+            # - component.update: wifisignal
+            # - component.update: battery
             - component.update: my_display
             # - lambda: 'WiFi.mode(WIFI_OFF);'
             - delay: 6s
@@ -205,14 +205,19 @@ sensor:
   - platform: wifi_signal
     name: "$devicename WiFi Signal Sensor"
     id: wifisignal
-    update_interval: never
+    update_interval: 5min
 
   - platform: adc
     pin: GPIO34
     attenuation: 11db
     id: battery
     name: "Battery Voltage"
-    update_interval: never
+    update_interval: 5min
+    # filters:
+    # - calibrate_linear:
+          Map 0.0 (from sensor) to 0.0 (true value)
+          # - 3.3 -> 100
+          # - 0 -> 0
 
 spi:
   clk_pin: GPIO19
@@ -405,7 +410,7 @@ display:
       /* Battery Voltage */
       if(id(battery).has_state()) {
         x = 460, y = 400;
-        if (id(battery).state >= 3.3) {
+        if (id(battery).state >= 3.30) {
             // 100 %
             it.print(x, y, id(weather_font), TextAlign::BOTTOM_LEFT, "󰁹");
         } else if (id(battery).state  >= 3.13) {
