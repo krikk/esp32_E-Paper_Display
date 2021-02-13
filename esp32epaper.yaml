@@ -371,7 +371,10 @@ font:
       '󰊚', # F029A mdi-gauge
       '󱗺', # F15FA mdi-windsock
       '󰖌', # F058C mdi-water
-      '󰅐', # F0150 mdi-clock-outline Clock      
+      '󰅐', # F0150 mdi-clock-outline Clock
+
+      '󱇛', # F11DB mdi-window-closed-variant
+      '󱇜', # F11DC mdi-window-open-variant
 
       # Sun
       '󰖛', # F059B mdi-weather-sunset-down
@@ -387,7 +390,6 @@ font:
       "󰽡", # F0F63 mdi-moon-last-quarter last_quarter
       "󰽨", # F0F65 mdi-moon-waning-crescent waning_crescent
 
-      "󰁔", # F0054 mdi-arrow-right
       
       # room icons
       '󱕭', # F156D mdi-sofa-outline
