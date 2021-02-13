@@ -30,21 +30,82 @@ then
     // mqttActions.publishMQTT("esp32epaper/input/TotalPower", emonAccumulatedWatts.state.toString, true)
 end
 
-rule esp32epaperInsideTemperature
+rule esp32epaperTempLivingRoom
 when
     Item Aqara1Temperatur changed
 then 
     val mqttActions = getActions("mqtt","mqtt:broker:mosquitto_raspi")
-    mqttActions.publishMQTT("esp32epaper/input/InsideTemperature", Aqara1Temperatur.state.toString, true)
+    mqttActions.publishMQTT("esp32epaper/input/tempLivingRoom", Aqara1Temperatur.state.format("%.1f"), true)
+end
+rule esp32epaperHumLivingRoom
+when
+    Item Aqara1Luftfeuchte changed
+then 
+    val mqttActions = getActions("mqtt","mqtt:broker:mosquitto_raspi")
+    mqttActions.publishMQTT("esp32epaper/input/humLivingRoom", Aqara1Luftfeuchte.state.format("%.0f"), true)
 end
 
-rule esp32epaperInsideHumidity
+rule esp32epapertempBath
 when
-    Item Aqara1Temperatur changed
+    Item Aqara2Temperatur changed
 then 
     val mqttActions = getActions("mqtt","mqtt:broker:mosquitto_raspi")
-    mqttActions.publishMQTT("esp32epaper/input/InsideHumidity", Aqara1Luftfeuchte.state.format("%.0f"), true)
+    mqttActions.publishMQTT("esp32epaper/input/tempBath", Aqara2Temperatur.state.format("%.1f"), true)
 end
+rule esp32epaperhumBath
+when
+    Item Aqara2Luftfeuchte changed
+then 
+    val mqttActions = getActions("mqtt","mqtt:broker:mosquitto_raspi")
+    mqttActions.publishMQTT("esp32epaper/input/humBath", Aqara2Luftfeuchte.state.format("%.0f"), true)
+end
+
+rule esp32epapertempBedroom
+when
+    Item SchlafzimmerTemperatur changed
+then 
+    val mqttActions = getActions("mqtt","mqtt:broker:mosquitto_raspi")
+    mqttActions.publishMQTT("esp32epaper/input/tempBedroom", SchlafzimmerTemperatur.state.format("%.1f"), true)
+end
+rule esp32epaperhumBedroom
+when
+    Item SchlafzimmerLuftfeuchte changed
+then 
+    val mqttActions = getActions("mqtt","mqtt:broker:mosquitto_raspi")
+    mqttActions.publishMQTT("esp32epaper/input/humBedroom", SchlafzimmerLuftfeuchte.state.format("%.0f"), true)
+end
+
+rule esp32epapertempBoysroom
+when
+    Item KinderzimmerTemperatur changed
+then 
+    val mqttActions = getActions("mqtt","mqtt:broker:mosquitto_raspi")
+    mqttActions.publishMQTT("esp32epaper/input/tempBoysroom", KinderzimmerTemperatur.state.format("%.1f"), true)
+end
+rule esp32epaperhumBoysroom
+when
+    Item KinderzimmerLuftfeuchte changed
+then 
+    val mqttActions = getActions("mqtt","mqtt:broker:mosquitto_raspi")
+    mqttActions.publishMQTT("esp32epaper/input/humBoysroom", KinderzimmerLuftfeuchte.state.format("%.0f"), true)
+end
+
+
+rule esp32epapertempGirlsroom
+when
+    Item ArbeitszimmerTemperatur changed
+then 
+    val mqttActions = getActions("mqtt","mqtt:broker:mosquitto_raspi")
+    mqttActions.publishMQTT("esp32epaper/input/tempGirlsroom", ArbeitszimmerTemperatur.state.format("%.1f"), true)
+end
+rule esp32epaperhumGirlsroom
+when
+    Item ArbeitszimmerLuftfeuchte changed
+then 
+    val mqttActions = getActions("mqtt","mqtt:broker:mosquitto_raspi")
+    mqttActions.publishMQTT("esp32epaper/input/humGirlsroom", ArbeitszimmerLuftfeuchte.state.format("%.0f"), true)
+end
+
 
 rule esp32epaperCO2
 when
