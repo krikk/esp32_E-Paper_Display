@@ -79,6 +79,13 @@ mqtt:
   password: !secret mqtt_password
   discovery: false
   client_id: $devicename
+  birth_message:
+    topic: tele/$devicename/LWT
+    payload: Online
+  will_message:
+    topic: tele/$devicename/LWT
+    payload: Offline
+
   on_message: # Manueller refresh des Displays bei Änderung
     - topic: $devicename/input/ota_mode
       payload: '1'
