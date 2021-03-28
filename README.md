@@ -1,14 +1,15 @@
-# esp32_E-Paper_Display
+# ESP32 based E-Paper Display to display Smart Home Data
 
 
-<p align="center"> <img src="images/front.jpg" width="300"><img src="images/back.jpg" width="300"></p>
-<p align="center"> <img src="images/side.jpg" width="300" > <img src="images/inside.jpg" width="300" ></p>
+<p align="center"> <img src="images/front.jpg" width="400"><img src="images/back.jpg" width="400"></p>
+<p align="center"> <img src="images/side.jpg" width="400" > <img src="images/inside.jpg" width="400" ></p>
 
 This is the documentation of my self-build ESP32 based E-Ink Display for displaying Smart Home Data. All of this is heavily inspired on this thread: https://community.home-assistant.io/t/e-paper-display/138625/92
 
 But as I am a OpenHAB user, it is all based on MQTT, and this is still work in progress...
 
 Used Hardware:
+- Custom build wooden Case (thanks to my father!)
 - [Thingpulse ePulse – Low Power ESP32 development board](https://thingpulse.com/product/epulse-low-power-esp32-development-board/) 
 - [Waveshare 7.5inch e-Paper HAT](https://www.waveshare.com/wiki/7.5inch_e-Paper_HAT)
 - 2 x [18650 Battery Holder](https://www.aliexpress.com/item/4000066839172.html)
