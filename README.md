@@ -26,6 +26,7 @@ Out: 2.625V
 
 
 Used Software:
+- GIMP: to do the layout (see Gimp_Prototype.xcf)
 - [ESPHome](https://esphome.io/index.html)
 - you find my code in this repository
 - the BLE part is disabled, because of memory problems...
