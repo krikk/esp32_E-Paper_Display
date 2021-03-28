@@ -13,8 +13,16 @@ Used Hardware:
 - [Waveshare 7.5inch e-Paper HAT](https://www.waveshare.com/wiki/7.5inch_e-Paper_HAT)
 - 2 x [18650 Battery Holder](https://www.aliexpress.com/item/4000066839172.html)
 - 4 x [Liitokala 18650 3400mAh Li-Ion NCR18650B rechargeable Li-lon](https://www.aliexpress.com/item/32362625564.html)
-- 1 x 220 kOhm resistor
-- 1 x 100 kOhm resistor
+- 1 x 220 kOhm resistor (for the voltage divider)
+- 1 x 100 kOhm resistor (for the voltage divider)
+
+The battery holders are connected in serial, so that we have an output voltage of 8.4 V max and 5 V min, to monitor battery level i build a voltage divider:
+Input 8.4 V
+R1 = 220kOhm
+R2= 100kOhm
+Out: 2.625V
+
+
 
 Used Software:
 - [ESPHome](https://esphome.io/index.html)
