@@ -525,7 +525,7 @@ display:
       // Print inside temperature
       it.print(0, 40, id(icon_70), TextAlign::CENTER_LEFT, "󱕭");
       if (id(tempLivingRoom).has_state()) {
-        it.printf(90, 40, id(font_40), TextAlign::CENTER_LEFT , "%2.1f°C", id(tempLivingRoom).state);
+        it.printf(90, 40, id(font_40), TextAlign::CENTER_LEFT , "%2.1f°", id(tempLivingRoom).state);
         }
       if (id(humLivingRoom).has_state()) {
         it.printf(315, 40, id(icon_40), TextAlign::CENTER_RIGHT, "󰖎"); 
@@ -535,7 +535,7 @@ display:
       // Bath
       it.print(0, 120, id(icon_70), TextAlign::CENTER_LEFT, "󰦠");
       if (id(tempBath).has_state()) {
-        it.printf(90, 120, id(font_40), TextAlign::CENTER_LEFT , "%2.1f°C", id(tempBath).state);
+        it.printf(90, 120, id(font_40), TextAlign::CENTER_LEFT , "%2.1f°", id(tempBath).state);
         }
       if (id(humBath).has_state()) {
         it.printf(315, 120, id(icon_40), TextAlign::CENTER_RIGHT, "󰖎"); 
@@ -545,7 +545,7 @@ display:
       // bedroom
       it.print(0, 200, id(icon_70), TextAlign::CENTER_LEFT, "󰿑");
       if (id(tempBedroom).has_state()) {
-        it.printf(90, 200, id(font_40), TextAlign::CENTER_LEFT , "%2.1f°C", id(tempBedroom).state);
+        it.printf(90, 200, id(font_40), TextAlign::CENTER_LEFT , "%2.1f°", id(tempBedroom).state);
         }
       if (id(humBedroom).has_state()) {
         it.printf(315, 200, id(icon_40), TextAlign::CENTER_RIGHT, "󰖎"); 
@@ -555,7 +555,7 @@ display:
       // boys-room
       it.print(0, 280, id(icon_70), TextAlign::CENTER_LEFT, "󰙍");
       if (id(tempBoysroom).has_state()) {
-        it.printf(90, 280, id(font_40), TextAlign::CENTER_LEFT , "%2.1f°C", id(tempBoysroom).state);
+        it.printf(90, 280, id(font_40), TextAlign::CENTER_LEFT , "%2.1f°", id(tempBoysroom).state);
         }
       if (id(humBoysroom).has_state()) {
         it.printf(315, 280, id(icon_40), TextAlign::CENTER_RIGHT, "󰖎"); 
@@ -565,7 +565,7 @@ display:
       // girl-room
       it.print(0, 360, id(icon_70), TextAlign::CENTER_LEFT, "󰙉");
       if (id(tempGirlsroom).has_state()) {
-        it.printf(90, 360, id(font_40), TextAlign::CENTER_LEFT , "%2.1f°C", id(tempGirlsroom).state);
+        it.printf(90, 360, id(font_40), TextAlign::CENTER_LEFT , "%2.1f°", id(tempGirlsroom).state);
         }
       if (id(humGirlsroom).has_state()) {
         it.printf(315, 360, id(icon_40), TextAlign::CENTER_RIGHT, "󰖎"); 
@@ -611,9 +611,9 @@ display:
       // Print consumer
       if (id(pvPower).has_state()) {
         it.print(-13, 480, id(icon_70), TextAlign::BOTTOM_LEFT, "󰚥");
-        it.printf(45, 480, id(font_55), TextAlign::BOTTOM_LEFT , "%4.0f W", id(totalPower).state);
+        it.printf(45, 480, id(font_55), TextAlign::BOTTOM_LEFT , "%4.0fW", id(totalPower).state);
         it.print(645, 480, id(icon_70), TextAlign::BOTTOM_RIGHT, "󰩲");
-        it.printf(800, 480, id(font_55), TextAlign::BOTTOM_RIGHT , "%3.0f W", id(pvPower).state);
+        it.printf(800, 480, id(font_55), TextAlign::BOTTOM_RIGHT , "%3.0fW", id(pvPower).state);
         
 
 
