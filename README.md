@@ -18,10 +18,10 @@ Used Hardware:
 - 1 x 100 kOhm resistor (for the voltage divider)
 
 The battery holders are connected in serial, so that we have an output voltage of 8.4 V max and 5 V min, to monitor battery level i build a voltage divider:
-Input 8.4 V
-R1 = 220kOhm
-R2= 100kOhm
-Out: 2.625V
+- Input 8.4 V
+- R1 = 220kOhm
+- R2= 100kOhm
+- Out: 2.625V
 
 
 
