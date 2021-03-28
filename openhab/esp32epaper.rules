@@ -8,9 +8,9 @@ then
     val mqttActions = getActions("mqtt","mqtt:broker:mosquitto_raspi")
     // averageSince returns null when PVPower is 0 ..???!! 
     val lastValue = HikingDDS2382Power.state as Number
-    logInfo("esp32rules.rules", "PVPower lastValue value: " + lastValue)
+    // logInfo("esp32rules.rules", "PVPower lastValue value: " + lastValue)
     val temp = HikingDDS2382Power.averageSince(now.minusMinutes(1))
-    logInfo("esp32rules.rules", "PVPower average value: " + temp)
+    // logInfo("esp32rules.rules", "PVPower average value: " + temp)
     if ((temp != null) && (lastValue != 0.0)) {
         mqttActions.publishMQTT("esp32epaper/input/PVPower", (temp).format("%.0f"), true)
     }
@@ -26,8 +26,8 @@ when
     Item emonAccumulatedWatts changed
 then 
     val mqttActions = getActions("mqtt","mqtt:broker:mosquitto_raspi")
+    mqttActions.publishMQTT("esp32epaper/input/TotalPower", emonAccumulatedWatts.state.format("%.0f"), true)
     mqttActions.publishMQTT("esp32epaper/input/TotalPower", (emonAccumulatedWatts.averageSince(now.minusMinutes(1))).format("%.0f"), true)
-    // mqttActions.publishMQTT("esp32epaper/input/TotalPower", emonAccumulatedWatts.state.toString, true)
 end
 
 rule esp32epaperTempLivingRoom
@@ -127,29 +127,37 @@ end
 rule esp32epaperMoonPhase 
 when 
     Item MoonPhase changed
-    // or  Time cron "0/5 * * ? * * *"  // Every 5 secs 
+    // or  Time cron "0/10 * * ? * * *"  // Every 5 secs 
 then 
     val mqttActions = getActions("mqtt","mqtt:broker:mosquitto_raspi")
     
     //   "󰽢", # NEW                     NEW=🌑 Neumond
-    //   "󰽦", # WAXING_CRESCENT          WAXING_CRESCENT=🌑→🌓 zunehmender Halbmond 
+    //   "󰽦", # WAXING_CRESCENT          WAXING_CRESCENT=🌑→🌓 zunehmender Halbmond
     //   "󰽣", # FIRST_QUARTER           FIRST_QUARTER=🌓 erstes Viertel
     //   "󰽥", # WAXING_GIBBOUS          WAXING_GIBBOUS=🌓→🌕 zunehmender Mond
-    //   "󰽤", # FULL                     FULL=🌕 Vollmond 
+    //   "󰽤", # FULL                     FULL=🌕 Vollmond
     //   "󰽧", # WANING_GIBBOUS          WANING_GIBBOUS=🌕→🌗 abnehmender Mond
-    //   "󰽡", # THIRD_QUARTER            THIRD_QUARTER=🌗 letztes Viertel 
+    //   "󰽡", # THIRD_QUARTER            THIRD_QUARTER=🌗 letztes Viertel
     //   "󰽨", # WANING_CRESCENT         WANING_CRESCENT=🌗→🌑 abnehmender Halbmond
 
 	switch MoonPhase.state.toString
 	{
 		case "NEW": mqttActions.publishMQTT("esp32epaper/input/MoonPhase", "󰽢", true)
+		case "🌑 Neumond": mqttActions.publishMQTT("esp32epaper/input/MoonPhase", "󰽢", true)
 		case "WAXING_CRESCENT": mqttActions.publishMQTT("esp32epaper/input/MoonPhase", "󰽦", true)
+		case "🌑→🌓 zunehmender Halbmond": mqttActions.publishMQTT("esp32epaper/input/MoonPhase", "󰽦", true)
 		case "FIRST_QUARTER": mqttActions.publishMQTT("esp32epaper/input/MoonPhase", "󰽣", true)
+		case "🌓 erstes Viertel": mqttActions.publishMQTT("esp32epaper/input/MoonPhase", "󰽣", true)
 		case "WAXING_GIBBOUS": mqttActions.publishMQTT("esp32epaper/input/MoonPhase", "󰽥", true)
+		case "🌓→🌕 zunehmender Mond": mqttActions.publishMQTT("esp32epaper/input/MoonPhase", "󰽥", true)
 		case "FULL": mqttActions.publishMQTT("esp32epaper/input/MoonPhase", "󰽤", true)
+		case "🌕 Vollmond": mqttActions.publishMQTT("esp32epaper/input/MoonPhase", "󰽤", true)
 		case "WANING_GIBBOUS": mqttActions.publishMQTT("esp32epaper/input/MoonPhase", "󰽧", true)
+		case "🌕→🌗 abnehmender Mond": mqttActions.publishMQTT("esp32epaper/input/MoonPhase", "󰽧", true)
 		case "THIRD_QUARTER": mqttActions.publishMQTT("esp32epaper/input/MoonPhase", "󰽡", true)
+		case "🌗 letztes Viertel": mqttActions.publishMQTT("esp32epaper/input/MoonPhase", "󰽡", true)
 		case "WANING_CRESCENT": mqttActions.publishMQTT("esp32epaper/input/MoonPhase", "󰽨", true)
+		case "🌗→🌑 abnehmender Halbmond": mqttActions.publishMQTT("esp32epaper/input/MoonPhase", "󰽨", true)
 		default:
 		{   
             mqttActions.publishMQTT("esp32epaper/input/MoonPhase", "", true)
