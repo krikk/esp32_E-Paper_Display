@@ -28,6 +28,7 @@ The battery holders are connected in serial, so that we have an output voltage o
 Used Software:
 - GIMP: to do the layout (see Gimp_Prototype.xcf)
 - [ESPHome](https://esphome.io/index.html)
+- [OpenHAB](https://www.openhab.org/) you the needed rules in openhab/esp32epaper.rules
 - you find my code in this repository
 - the BLE part is disabled, because of memory problems...
 
