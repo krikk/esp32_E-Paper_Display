@@ -19,6 +19,7 @@ Used Hardware:
 Used Software:
 - [ESPHome](https://esphome.io/index.html)
 - you find my code in this repository
+- the BLE part is disabled, because of memory problems...
 
 To correctly compile this you have to create a secrets.yaml file within the root directory of the project with the following content:
 ```console
