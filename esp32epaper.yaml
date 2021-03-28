@@ -450,7 +450,7 @@ display:
 
       /* Print time in HH:MM format */
       it.strftime(400, 495, id(clock_font), TextAlign::BOTTOM_CENTER, "%H:%M", id(current_time).now());
-      it.strftime(315, 360, id(font_55), TextAlign::CENTER_LEFT, "%a %d.%m.%Y", id(current_time).now());
+      it.strftime(245, 400, id(font_55), TextAlign::BOTTOM_LEFT, "%a %d.%b %Y", id(current_time).now());
 
       /* Moon icon */
       if(id(moonPhase).has_state()) {
@@ -523,53 +523,53 @@ display:
       }
 
       // Print inside temperature
-      it.print(0, 40, id(icon_70), TextAlign::CENTER_LEFT, "󱕭");
+      it.print(0, 35, id(icon_70), TextAlign::CENTER_LEFT, "󱕭");
       if (id(tempLivingRoom).has_state()) {
-        it.printf(90, 40, id(font_40), TextAlign::CENTER_LEFT , "%2.1f°", id(tempLivingRoom).state);
+        it.printf(90, 35, id(font_40), TextAlign::CENTER_LEFT , "%2.1f°", id(tempLivingRoom).state);
         }
       if (id(humLivingRoom).has_state()) {
-        it.printf(315, 40, id(icon_40), TextAlign::CENTER_RIGHT, "󰖎"); 
-        it.printf(235, 40, id(font_40), TextAlign::CENTER_LEFT , "%2.0f", id(humLivingRoom).state);
+        it.printf(315, 35, id(icon_40), TextAlign::CENTER_RIGHT, "󰖎"); 
+        it.printf(235, 35, id(font_40), TextAlign::CENTER_LEFT , "%2.0f", id(humLivingRoom).state);
         }
 
       // Bath
-      it.print(0, 120, id(icon_70), TextAlign::CENTER_LEFT, "󰦠");
+      it.print(0, 105, id(icon_70), TextAlign::CENTER_LEFT, "󰦠");
       if (id(tempBath).has_state()) {
-        it.printf(90, 120, id(font_40), TextAlign::CENTER_LEFT , "%2.1f°", id(tempBath).state);
+        it.printf(90, 105, id(font_40), TextAlign::CENTER_LEFT , "%2.1f°", id(tempBath).state);
         }
       if (id(humBath).has_state()) {
-        it.printf(315, 120, id(icon_40), TextAlign::CENTER_RIGHT, "󰖎"); 
-        it.printf(235, 120, id(font_40), TextAlign::CENTER_LEFT , "%2.0f", id(humBath).state);
+        it.printf(315, 105, id(icon_40), TextAlign::CENTER_RIGHT, "󰖎"); 
+        it.printf(235, 105, id(font_40), TextAlign::CENTER_LEFT , "%2.0f", id(humBath).state);
         }
         
       // bedroom
-      it.print(0, 200, id(icon_70), TextAlign::CENTER_LEFT, "󰿑");
+      it.print(0, 175, id(icon_70), TextAlign::CENTER_LEFT, "󰿑");
       if (id(tempBedroom).has_state()) {
-        it.printf(90, 200, id(font_40), TextAlign::CENTER_LEFT , "%2.1f°", id(tempBedroom).state);
+        it.printf(90, 175, id(font_40), TextAlign::CENTER_LEFT , "%2.1f°", id(tempBedroom).state);
         }
       if (id(humBedroom).has_state()) {
-        it.printf(315, 200, id(icon_40), TextAlign::CENTER_RIGHT, "󰖎"); 
-        it.printf(235, 200, id(font_40), TextAlign::CENTER_LEFT , "%2.0f", id(humBedroom).state);
+        it.printf(315, 175, id(icon_40), TextAlign::CENTER_RIGHT, "󰖎"); 
+        it.printf(235, 175, id(font_40), TextAlign::CENTER_LEFT , "%2.0f", id(humBedroom).state);
         }
         
       // boys-room
-      it.print(0, 280, id(icon_70), TextAlign::CENTER_LEFT, "󰙍");
+      it.print(0, 245, id(icon_70), TextAlign::CENTER_LEFT, "󰙍");
       if (id(tempBoysroom).has_state()) {
-        it.printf(90, 280, id(font_40), TextAlign::CENTER_LEFT , "%2.1f°", id(tempBoysroom).state);
+        it.printf(90, 245, id(font_40), TextAlign::CENTER_LEFT , "%2.1f°", id(tempBoysroom).state);
         }
       if (id(humBoysroom).has_state()) {
-        it.printf(315, 280, id(icon_40), TextAlign::CENTER_RIGHT, "󰖎"); 
-        it.printf(235, 280, id(font_40), TextAlign::CENTER_LEFT , "%2.0f", id(humBoysroom).state);
+        it.printf(315, 245, id(icon_40), TextAlign::CENTER_RIGHT, "󰖎"); 
+        it.printf(235, 245, id(font_40), TextAlign::CENTER_LEFT , "%2.0f", id(humBoysroom).state);
         }
         
       // girl-room
-      it.print(0, 360, id(icon_70), TextAlign::CENTER_LEFT, "󰙉");
+      it.print(0, 315, id(icon_70), TextAlign::CENTER_LEFT, "󰙉");
       if (id(tempGirlsroom).has_state()) {
-        it.printf(90, 360, id(font_40), TextAlign::CENTER_LEFT , "%2.1f°", id(tempGirlsroom).state);
+        it.printf(90, 315, id(font_40), TextAlign::CENTER_LEFT , "%2.1f°", id(tempGirlsroom).state);
         }
       if (id(humGirlsroom).has_state()) {
-        it.printf(315, 360, id(icon_40), TextAlign::CENTER_RIGHT, "󰖎"); 
-        it.printf(235, 360, id(font_40), TextAlign::CENTER_LEFT , "%2.0f", id(humGirlsroom).state);
+        it.printf(315, 315, id(icon_40), TextAlign::CENTER_RIGHT, "󰖎"); 
+        it.printf(235, 315, id(font_40), TextAlign::CENTER_LEFT , "%2.0f", id(humGirlsroom).state);
         }
         
       // Print outside temperature 
