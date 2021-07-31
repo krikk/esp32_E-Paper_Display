@@ -23,7 +23,7 @@ The battery holders are connected in serial, so that we have an output voltage o
 - R2= 100kOhm
 - Out: 2.625V
 
-
+*...i need to optimize the power consumption, because this whole setup is only running for about 30 days, with 4x3400mA Batteries!!... still investigating this...*
 
 Used Software:
 - GIMP: to do the layout (see Gimp_Prototype.xcf)
