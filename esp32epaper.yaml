@@ -68,6 +68,11 @@ esphome:
                   - deep_sleep.enter: deep_sleep_1
           else:
             - logger.log: "waiting for values..."
+
+  on_shutdown:
+    then:
+      - lambda: "adc_power_off(); my_display->deep_sleep();"
+
 packages:
   wifi: !include wifi.yaml
 #  ble: !include ble.yaml
@@ -116,8 +121,8 @@ mqtt:
 
 # Enable logging
 logger:
-  # level: DEBUG
-  level: ERROR
+  level: DEBUG
+  # level: ERROR
 
 
 time:
@@ -282,7 +287,7 @@ sensor:
     update_interval: 5min
 
   - platform: adc
-    pin: GPIO34
+    pin: GPIO36
     attenuation: 11db
     id: battery
     name: "Battery Voltage"
