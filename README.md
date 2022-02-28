@@ -12,8 +12,8 @@ Used Hardware:
 - Custom build wooden Case (thanks to my father!)
 - [Thingpulse ePulse – Low Power ESP32 development board](https://thingpulse.com/product/epulse-low-power-esp32-development-board/) 
 - [Waveshare 7.5inch e-Paper HAT](https://www.waveshare.com/wiki/7.5inch_e-Paper_HAT)
-- 2 x [18650 Battery Holder](https://www.aliexpress.com/item/4000066839172.html)
-- 4 x [Liitokala 18650 3400mAh Li-Ion NCR18650B rechargeable Li-lon](https://www.aliexpress.com/item/32362625564.html)
+- 3 x [18650 Battery Holder](https://www.aliexpress.com/item/4000066839172.html)
+- 6 x [Liitokala 18650 3400mAh Li-Ion NCR18650B rechargeable Li-lon](https://www.aliexpress.com/item/32362625564.html)
 - 1 x 220 kOhm resistor (for the voltage divider)
 - 1 x 100 kOhm resistor (for the voltage divider)
 
@@ -28,7 +28,7 @@ The battery holders are connected in serial, so that we have an output voltage o
 Used Software:
 - GIMP: to do the layout (see Gimp_Prototype.xcf)
 - [ESPHome](https://esphome.io/index.html)
-- [OpenHAB](https://www.openhab.org/) you find the needed rules in openhab/esp32epaper.rules
+- [OpenHAB](https://www.openhab.org/) you find the needed rules in openhab/esp32epaper.rules (needs JSScripting)
 - you find my code in this repository
 - the BLE part is disabled, because of memory problems...
 
