@@ -49,16 +49,19 @@ esphome:
     then:
       - if:
           condition:
-            lambda: 'return (id(valueCount) == 19) ;'  # all would be 19
+            lambda: 'return (id(valueCount) == 1);'  # all would be 19
           then:
             - logger.log: "all values ready..."
-            - lambda: 'id(valueCount) += 1;'
+            - lambda: |-
+                id(valueCount) += 1;
+                ESP_LOGD("main", "displayValues at start is: %s", id(displayValues).state.c_str());
             # - component.update: wifisignal
             # - component.update: battery
             - component.update: my_display
             # - lambda: 'WiFi.mode(WIFI_OFF);'
+            - logger.log: "waiting 6s..."
             - delay: 6s
-            - logger.log: "delayed 6s..."
+            - logger.log: "6s later."
             - if:
                 condition:
                   lambda: 'return id(prevent_sleep);'
@@ -67,7 +70,7 @@ esphome:
                 else:
                   - deep_sleep.enter: deep_sleep_1
           else:
-            - logger.log: "waiting for values..."
+            #- logger.log: "waiting for values..."
 
   on_shutdown:
     then:
@@ -131,160 +134,28 @@ time:
    timezone: Europe/Vienna
    servers : 192.168.11.1
 
-#web_server:
-#  port: 80
-
-#switch:
-#  - platform: restart
-#    name: "$devicename Restart"
 
 text_sensor:
   - platform: mqtt_subscribe
-    id: moonPhase
-    topic: esp32epaper/input/MoonPhase
+    id: displayValues
+    topic: $devicename/input/DisplayValues
     on_value:
       then:
-        - lambda: 'id(valueCount) += 1; ESP_LOGD("main", "Value %i received" , id(valueCount));'
- 
-uart:
-  rx_pin: GPIO26
-  tx_pin: GPIO25
-  baud_rate: 9600
+        - lambda: |-
+            ESP_LOGD("main",  "The displayValues is: %s", id(displayValues).state.c_str());
+            ESP_LOGD("main", "Value %i before received" , id(valueCount));
+            id(valueCount) += 1;
+            ESP_LOGD("main", "Value %i received" , id(valueCount));
+
 
 sensor:
 #  - platform: uptime
 #    name: "$devicename Uptime Sensor"
 
-  - platform: mqtt_subscribe
-    id: tempOutside
-    topic: esp32epaper/input/tempOutside
-    on_value:
-      then:
-        - lambda: 'id(valueCount) += 1; ESP_LOGD("main", "Value %i received" , id(valueCount));'
-
-  - platform: mqtt_subscribe
-    id: humOutside
-    topic: esp32epaper/input/humOutside
-    on_value:
-      then:
-        - lambda: 'id(valueCount) += 1; ESP_LOGD("main", "Value %i received" , id(valueCount));'
-
-  # Wohnzimmer
-  - platform: mqtt_subscribe
-    id: tempLivingRoom
-    topic: esp32epaper/input/tempLivingRoom
-    on_value:
-      then:
-        - lambda: 'id(valueCount) += 1; ESP_LOGD("main", "Value %i received" , id(valueCount));'
-  - platform: mqtt_subscribe
-    id: humLivingRoom
-    topic: esp32epaper/input/humLivingRoom
-    on_value:
-      then:
-        - lambda: 'id(valueCount) += 1; ESP_LOGD("main", "Value %i received" , id(valueCount));'
-
-  # Bad
-  - platform: mqtt_subscribe
-    id: tempBath
-    topic: esp32epaper/input/tempBath
-    on_value:
-      then:
-        - lambda: 'id(valueCount) += 1; ESP_LOGD("main", "Value %i received" , id(valueCount));'
-  - platform: mqtt_subscribe
-    id: humBath
-    topic: esp32epaper/input/humBath
-    on_value:
-      then:
-        - lambda: 'id(valueCount) += 1; ESP_LOGD("main", "Value %i received" , id(valueCount));'
-
-  # Schlafzimmer
-  - platform: mqtt_subscribe
-    id: tempBedroom
-    topic: esp32epaper/input/tempBedroom
-    on_value:
-      then:
-        - lambda: 'id(valueCount) += 1; ESP_LOGD("main", "Value %i received" , id(valueCount));'
-  - platform: mqtt_subscribe
-    id: humBedroom
-    topic: esp32epaper/input/humBedroom
-    on_value:
-      then:
-        - lambda: 'id(valueCount) += 1; ESP_LOGD("main", "Value %i received" , id(valueCount));'
-
-  # S.Zimmer
-  - platform: mqtt_subscribe
-    id: tempBoysroom
-    topic: esp32epaper/input/tempBoysroom
-    on_value:
-      then:
-        - lambda: 'id(valueCount) += 1; ESP_LOGD("main", "Value %i received" , id(valueCount));'
-  - platform: mqtt_subscribe
-    id: humBoysroom
-    topic: esp32epaper/input/humBoysroom
-    on_value:
-      then:
-        - lambda: 'id(valueCount) += 1; ESP_LOGD("main", "Value %i received" , id(valueCount));'
-
-  # L.Zimmer
-  - platform: mqtt_subscribe
-    id: tempGirlsroom
-    topic: esp32epaper/input/tempGirlsroom
-    on_value:
-      then:
-        - lambda: 'id(valueCount) += 1; ESP_LOGD("main", "Value %i received" , id(valueCount));'
-  - platform: mqtt_subscribe
-    id: humGirlsroom
-    topic: esp32epaper/input/humGirlsroom
-    on_value:
-      then:
-        - lambda: 'id(valueCount) += 1; ESP_LOGD("main", "Value %i received" , id(valueCount));'
-
-  - platform: mqtt_subscribe
-    id: pvPower
-    topic: esp32epaper/input/PVPower
-    on_value:
-      then:
-        - lambda: 'id(valueCount) += 1; ESP_LOGD("main", "Value %i received" , id(valueCount));'
-
-  - platform: mqtt_subscribe
-    topic: esp32epaper/input/TotalPower
-    id: totalPower
-    on_value:
-      then:
-        - lambda: 'id(valueCount) += 1; ESP_LOGD("main", "Value %i received" , id(valueCount));'
-
-  - platform: mqtt_subscribe
-    topic: esp32epaper/input/CO2
-    id: CO2
-    on_value:
-      then:
-        - lambda: 'id(valueCount) += 1; ESP_LOGD("main", "Value %i received" , id(valueCount));'
-
-  - platform: mqtt_subscribe
-    topic: esp32epaper/input/tempOutsideMin
-    id: tempOutsideMin
-    on_value:
-      then:
-        - lambda: 'id(valueCount) += 1; ESP_LOGD("main", "Value %i received" , id(valueCount));'
-
-  - platform: mqtt_subscribe
-    topic: esp32epaper/input/tempOutsideMax
-    id: tempOutsideMax
-    on_value:
-      then:
-        - lambda: 'id(valueCount) += 1; ESP_LOGD("main", "Value %i received" , id(valueCount));'
-
-  - platform: mqtt_subscribe
-    topic: esp32epaper/input/Wind
-    id: wind
-    on_value:
-      then:
-        - lambda: 'id(valueCount) += 1; ESP_LOGD("main", "Value %i received" , id(valueCount));'
-
-  - platform: wifi_signal
-    name: "$devicename WiFi Signal Sensor"
-    id: wifisignal
-    update_interval: 5min
+#  - platform: wifi_signal
+#    name: "$devicename WiFi Signal Sensor"
+#    id: wifisignal
+#    update_interval: 5min
 
   - platform: adc
     pin: GPIO36
@@ -452,20 +323,35 @@ display:
     id: my_display
     lambda: |
       int x, y;
-
-      /* Print time in HH:MM format */
-      it.strftime(400, 495, id(clock_font), TextAlign::BOTTOM_CENTER, "%H:%M", id(current_time).now());
-      it.strftime(245, 400, id(font_55), TextAlign::BOTTOM_LEFT, "%a %d.%b %Y", id(current_time).now());
-
-      /* Moon icon */
-      if(id(moonPhase).has_state()) {
-         //ESP_LOGI("Moon icon", "%s", id(moonPhase).state.c_str());
-        it.printf(800, 360, id(icon_70), TextAlign::CENTER_RIGHT, "%s", id(moonPhase).state.c_str());
+      
+      
+      
+      std::string str = id(displayValues).state;
+      std::vector<std::string> values;
+      char * token;
+      char seps[] = "#";
+      token = strtok (&str[0],seps);
+      while (token != NULL)
+      {
+        values.push_back(token);
+        token = strtok (NULL, seps);
+      }
+      /*
+      for ( std::string s : values ) {
+          ESP_LOGD("test: ", "String to Vector: %s", s.c_str());
       }
       
+      ESP_LOGD("test: ", "String time: %s", values.at(1).c_str());
+      */
+ 
+ 
+
+      /* Print time in HH:MM format */
+      it.printf(400, 495, id(clock_font), TextAlign::BOTTOM_CENTER, "%s", values.at(1).c_str());
+      it.printf(245, 400, id(font_55), TextAlign::BOTTOM_LEFT, "%s", values.at(0).c_str());
 
       
-      /* WiFi Signal Strenght */
+      /* WiFi Signal Strenght 
       if(id(wifisignal).has_state()) {
         x = 545, y = 466;
         if (id(wifisignal).state >= -50) {
@@ -490,7 +376,8 @@ display:
             ESP_LOGI("WiFi", "Unlikely");
         }
       }
-
+      */
+      
       /* Battery Voltage */
       if(id(battery).has_state()) {
         x = 233, y = 466;
@@ -526,103 +413,82 @@ display:
             it.print(x, y, id(weather_font), TextAlign::BOTTOM_LEFT, "󰁺");
         }
       }
+      
+      // pv power
+      it.print(645, 480, id(icon_70), TextAlign::BOTTOM_RIGHT, "󰩲");
+      it.printf(800, 480, id(font_55), TextAlign::BOTTOM_RIGHT , "%sW", values.at(2).c_str());
 
-      // Print inside temperature
+      
+      // total power
+      it.print(-13, 480, id(icon_70), TextAlign::BOTTOM_LEFT, "󰚥");
+      it.printf(45, 480, id(font_55), TextAlign::BOTTOM_LEFT , "%sW", values.at(3).c_str());
+
+      // outside temperature 
+      it.print(400, 0, id(font_30), TextAlign::TOP_LEFT, "OUT:"); 
+      it.printf(800, -19, id(font_100), TextAlign::TOP_RIGHT, "%s°C", values.at(4).c_str());
+
+      // outside min temperature 
+      it.print(400, 120, id(icon_40), TextAlign::CENTER_LEFT, "󰸂"); 
+      it.printf(440, 120, id(font_40), TextAlign::CENTER_LEFT, "%s°C", values.at(5).c_str());
+
+      // outside max temperature 
+      it.print(678, 120, id(icon_40), TextAlign::CENTER_RIGHT, "󰸃"); 
+      it.printf(800, 120, id(font_40), TextAlign::CENTER_RIGHT, "%s°C", values.at(6).c_str());
+      
+      // outside humidity
+      it.printf(812, 200, id(icon_55), TextAlign::CENTER_RIGHT, "󰖎"); 
+      it.printf(766, 200, id(font_55), TextAlign::CENTER_RIGHT, "%s", values.at(7).c_str());
+
+      //  livingroom temperature
       it.print(0, 35, id(icon_70), TextAlign::CENTER_LEFT, "󱕭");
-      if (id(tempLivingRoom).has_state()) {
-        it.printf(90, 35, id(font_40), TextAlign::CENTER_LEFT , "%2.1f°", id(tempLivingRoom).state);
-        }
-      if (id(humLivingRoom).has_state()) {
-        it.printf(315, 35, id(icon_40), TextAlign::CENTER_RIGHT, "󰖎"); 
-        it.printf(235, 35, id(font_40), TextAlign::CENTER_LEFT , "%2.0f", id(humLivingRoom).state);
-        }
+      it.printf(90, 35, id(font_40), TextAlign::CENTER_LEFT , "%s°", values.at(8).c_str());
+      // livingroom humidity
+      it.printf(315, 35, id(icon_40), TextAlign::CENTER_RIGHT, "󰖎"); 
+      it.printf(235, 35, id(font_40), TextAlign::CENTER_LEFT , "%s", values.at(9).c_str());
 
-      // Bath
+      // Bath temperature
       it.print(0, 105, id(icon_70), TextAlign::CENTER_LEFT, "󰦠");
-      if (id(tempBath).has_state()) {
-        it.printf(90, 105, id(font_40), TextAlign::CENTER_LEFT , "%2.1f°", id(tempBath).state);
-        }
-      if (id(humBath).has_state()) {
-        it.printf(315, 105, id(icon_40), TextAlign::CENTER_RIGHT, "󰖎"); 
-        it.printf(235, 105, id(font_40), TextAlign::CENTER_LEFT , "%2.0f", id(humBath).state);
-        }
-        
-      // bedroom
+      it.printf(90, 105, id(font_40), TextAlign::CENTER_LEFT , "%s°", values.at(10).c_str());
+      // bath humitidy
+      it.printf(315, 105, id(icon_40), TextAlign::CENTER_RIGHT, "󰖎"); 
+      it.printf(235, 105, id(font_40), TextAlign::CENTER_LEFT , "%s", values.at(11).c_str());
+
+      // bedroom temperature
       it.print(0, 175, id(icon_70), TextAlign::CENTER_LEFT, "󰿑");
-      if (id(tempBedroom).has_state()) {
-        it.printf(90, 175, id(font_40), TextAlign::CENTER_LEFT , "%2.1f°", id(tempBedroom).state);
-        }
-      if (id(humBedroom).has_state()) {
-        it.printf(315, 175, id(icon_40), TextAlign::CENTER_RIGHT, "󰖎"); 
-        it.printf(235, 175, id(font_40), TextAlign::CENTER_LEFT , "%2.0f", id(humBedroom).state);
-        }
-        
-      // boys-room
+      it.printf(90, 175, id(font_40), TextAlign::CENTER_LEFT , "%s°", values.at(12).c_str());
+      // bedroom humidity
+      it.printf(315, 175, id(icon_40), TextAlign::CENTER_RIGHT, "󰖎"); 
+      it.printf(235, 175, id(font_40), TextAlign::CENTER_LEFT , "%s", values.at(13).c_str());
+
+      // boys-room temperature
       it.print(0, 245, id(icon_70), TextAlign::CENTER_LEFT, "󰙍");
-      if (id(tempBoysroom).has_state()) {
-        it.printf(90, 245, id(font_40), TextAlign::CENTER_LEFT , "%2.1f°", id(tempBoysroom).state);
-        }
-      if (id(humBoysroom).has_state()) {
-        it.printf(315, 245, id(icon_40), TextAlign::CENTER_RIGHT, "󰖎"); 
-        it.printf(235, 245, id(font_40), TextAlign::CENTER_LEFT , "%2.0f", id(humBoysroom).state);
-        }
-        
-      // girl-room
+      it.printf(90, 245, id(font_40), TextAlign::CENTER_LEFT , "%s°", values.at(14).c_str());
+      // boys-room humidity
+      it.printf(315, 245, id(icon_40), TextAlign::CENTER_RIGHT, "󰖎"); 
+      it.printf(235, 245, id(font_40), TextAlign::CENTER_LEFT , "%s", values.at(15).c_str());
+      
+      // girl-room temperature
       it.print(0, 315, id(icon_70), TextAlign::CENTER_LEFT, "󰙉");
-      if (id(tempGirlsroom).has_state()) {
-        it.printf(90, 315, id(font_40), TextAlign::CENTER_LEFT , "%2.1f°", id(tempGirlsroom).state);
-        }
-      if (id(humGirlsroom).has_state()) {
-        it.printf(315, 315, id(icon_40), TextAlign::CENTER_RIGHT, "󰖎"); 
-        it.printf(235, 315, id(font_40), TextAlign::CENTER_LEFT , "%2.0f", id(humGirlsroom).state);
-        }
-        
-      // Print outside temperature 
-      if (id(tempOutside).has_state()) {
-        it.print(400, 0, id(font_30), TextAlign::TOP_LEFT, "OUT:"); 
-        it.printf(800, -19, id(font_100), TextAlign::TOP_RIGHT, "%2.1f°C", id(tempOutside).state);
-      }
-      if (id(humOutside).has_state()) {
-        it.printf(812, 200, id(icon_55), TextAlign::CENTER_RIGHT, "󰖎"); 
-        it.printf(766, 200, id(font_55), TextAlign::CENTER_RIGHT, "%2.0f", id(humOutside).state);
-      }
+      it.printf(90, 315, id(font_40), TextAlign::CENTER_LEFT , "%s°", values.at(16).c_str());
+      // girl-room humidity
+      it.printf(315, 315, id(icon_40), TextAlign::CENTER_RIGHT, "󰖎"); 
+      it.printf(235, 315, id(font_40), TextAlign::CENTER_LEFT , "%s", values.at(17).c_str());
 
-      // Print outside min temperature 
-      if (id(tempOutsideMin).has_state()) {
-        it.print(400, 120, id(icon_40), TextAlign::CENTER_LEFT, "󰸂"); 
-        it.printf(440, 120, id(font_40), TextAlign::CENTER_LEFT, "%2.1f°C", id(tempOutsideMin).state);
-      }
-
-      // Print outside max temperature 
-      if (id(tempOutsideMax).has_state()) {
-        it.print(678, 120, id(icon_40), TextAlign::CENTER_RIGHT, "󰸃"); 
-        it.printf(800, 120, id(font_40), TextAlign::CENTER_RIGHT, "%2.1f°C", id(tempOutsideMax).state);
-      }
 
       /* CO2 icon */
-      if(id(CO2).has_state()) {
-        it.print(666, 280, id(icon_70), TextAlign::CENTER_RIGHT, "󰟤"); 
-        it.printf(773, 280, id(font_55), TextAlign::CENTER_RIGHT, "%4.0f", id(CO2).state);
-        it.printf(800, 300, id(font_14), TextAlign::BASELINE_RIGHT, "ppm");
-      }
-      
+      it.print(666, 280, id(icon_70), TextAlign::CENTER_RIGHT, "󰟤"); 
+      it.printf(773, 280, id(font_55), TextAlign::CENTER_RIGHT, "%s", values.at(18).c_str());
+      it.printf(800, 300, id(font_14), TextAlign::BASELINE_RIGHT, "ppm");
+
       /* wind */
-      if(id(wind).has_state()) {
-        it.print(400, 280, id(icon_70), TextAlign::CENTER_LEFT, "󱗺"); 
-        it.printf(525, 280, id(font_55), TextAlign::CENTER_RIGHT, "%2.0f", id(wind).state);
-        it.printf(525, 280, id(font_14), TextAlign::CENTER_LEFT, "km/h");
-      }
+      it.print(400, 280, id(icon_70), TextAlign::CENTER_LEFT, "󱗺"); 
+      it.printf(525, 280, id(font_55), TextAlign::CENTER_RIGHT, "%s", values.at(19).c_str());
+      it.printf(525, 280, id(font_14), TextAlign::CENTER_LEFT, "km/h");
+
+      /* Moon icon */
+      //ESP_LOGI("Moon icon", "%s", id(moonPhase).state.c_str());
+      it.printf(800, 360, id(icon_70), TextAlign::CENTER_RIGHT, "%s", values.at(20).c_str());
       
-      // Print consumer
-      if (id(pvPower).has_state()) {
-        it.print(-13, 480, id(icon_70), TextAlign::BOTTOM_LEFT, "󰚥");
-        it.printf(45, 480, id(font_55), TextAlign::BOTTOM_LEFT , "%4.0fW", id(totalPower).state);
-        it.print(645, 480, id(icon_70), TextAlign::BOTTOM_RIGHT, "󰩲");
-        it.printf(800, 480, id(font_55), TextAlign::BOTTOM_RIGHT , "%3.0fW", id(pvPower).state);
-        
-
-
-      }
       // it.line(0, 299, 400, 299);
 
 

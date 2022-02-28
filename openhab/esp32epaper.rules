@@ -1,170 +1,254 @@
-
-rule esp32epaperPVPower
-when
-    Item HikingDDS2382Power changed 
-    // or Time cron "* 0/5 * ? * * *"  // Every 5 mins
-    // or Time cron "0/5 * * ? * * *"  // Every 5 secs
-then 
-    val mqttActions = getActions("mqtt","mqtt:broker:mosquitto_raspi")
-    // averageSince returns null when PVPower is 0 ..???!! 
-    val lastValue = HikingDDS2382Power.state as Number
-    // logInfo("esp32rules.rules", "PVPower lastValue value: " + lastValue)
-    val temp = HikingDDS2382Power.averageSince(now.minusMinutes(1))
-    // logInfo("esp32rules.rules", "PVPower average value: " + temp)
-    if ((temp != null) && (lastValue != 0.0)) {
-        mqttActions.publishMQTT("esp32epaper/input/PVPower", (temp).format("%.0f"), true)
-    }
-    else {
-        mqttActions.publishMQTT("esp32epaper/input/PVPower", HikingDDS2382Power.state.format("%.0f"), true)
-        // logInfo("esp32rules.rules", "not changed, reporting last value")
-    }
-end
+configuration: {}
+triggers:
+  - id: "1"
+    configuration:
+      cronExpression: 57 * * * * ? *
+    type: timer.GenericCronTrigger
+conditions: []
+actions:
+  - inputs: {}
+    id: "2"
+    configuration:
+      type: application/javascript;version=ECMAScript-2021
+      script: >-
+        var ZonedDateTime = Java.type("java.time.ZonedDateTime");
 
 
-rule esp32epaperTotalPower
-when
-    Item emonAccumulatedWatts changed
-then 
-    val mqttActions = getActions("mqtt","mqtt:broker:mosquitto_raspi")
-    mqttActions.publishMQTT("esp32epaper/input/TotalPower", emonAccumulatedWatts.state.format("%.0f"), true)
-    mqttActions.publishMQTT("esp32epaper/input/TotalPower", (emonAccumulatedWatts.averageSince(now.minusMinutes(1))).format("%.0f"), true)
-end
-
-rule esp32epaperTempLivingRoom
-when
-    Item Aqara1Temperatur changed
-then 
-    val mqttActions = getActions("mqtt","mqtt:broker:mosquitto_raspi")
-    mqttActions.publishMQTT("esp32epaper/input/tempLivingRoom", Aqara1Temperatur.state.format("%.1f"), true)
-end
-rule esp32epaperHumLivingRoom
-when
-    Item Aqara1Luftfeuchte changed
-then 
-    val mqttActions = getActions("mqtt","mqtt:broker:mosquitto_raspi")
-    mqttActions.publishMQTT("esp32epaper/input/humLivingRoom", Aqara1Luftfeuchte.state.format("%.0f"), true)
-end
-
-rule esp32epapertempBath
-when
-    Item Aqara2Temperatur changed
-then 
-    val mqttActions = getActions("mqtt","mqtt:broker:mosquitto_raspi")
-    mqttActions.publishMQTT("esp32epaper/input/tempBath", Aqara2Temperatur.state.format("%.1f"), true)
-end
-rule esp32epaperhumBath
-when
-    Item Aqara2Luftfeuchte changed
-then 
-    val mqttActions = getActions("mqtt","mqtt:broker:mosquitto_raspi")
-    mqttActions.publishMQTT("esp32epaper/input/humBath", Aqara2Luftfeuchte.state.format("%.0f"), true)
-end
-
-rule esp32epapertempBedroom
-when
-    Item SchlafzimmerTemperatur changed
-then 
-    val mqttActions = getActions("mqtt","mqtt:broker:mosquitto_raspi")
-    mqttActions.publishMQTT("esp32epaper/input/tempBedroom", SchlafzimmerTemperatur.state.format("%.1f"), true)
-end
-rule esp32epaperhumBedroom
-when
-    Item SchlafzimmerLuftfeuchte changed
-then 
-    val mqttActions = getActions("mqtt","mqtt:broker:mosquitto_raspi")
-    mqttActions.publishMQTT("esp32epaper/input/humBedroom", SchlafzimmerLuftfeuchte.state.format("%.0f"), true)
-end
-
-rule esp32epapertempBoysroom
-when
-    Item KinderzimmerTemperatur changed
-then 
-    val mqttActions = getActions("mqtt","mqtt:broker:mosquitto_raspi")
-    mqttActions.publishMQTT("esp32epaper/input/tempBoysroom", KinderzimmerTemperatur.state.format("%.1f"), true)
-end
-rule esp32epaperhumBoysroom
-when
-    Item KinderzimmerLuftfeuchte changed
-then 
-    val mqttActions = getActions("mqtt","mqtt:broker:mosquitto_raspi")
-    mqttActions.publishMQTT("esp32epaper/input/humBoysroom", KinderzimmerLuftfeuchte.state.format("%.0f"), true)
-end
+        var out = "";
 
 
-rule esp32epapertempGirlsroom
-when
-    Item ArbeitszimmerTemperatur changed
-then 
-    val mqttActions = getActions("mqtt","mqtt:broker:mosquitto_raspi")
-    mqttActions.publishMQTT("esp32epaper/input/tempGirlsroom", ArbeitszimmerTemperatur.state.format("%.1f"), true)
-end
-rule esp32epaperhumGirlsroom
-when
-    Item ArbeitszimmerLuftfeuchte changed
-then 
-    val mqttActions = getActions("mqtt","mqtt:broker:mosquitto_raspi")
-    mqttActions.publishMQTT("esp32epaper/input/humGirlsroom", ArbeitszimmerLuftfeuchte.state.format("%.0f"), true)
-end
+        var now = ZonedDateTime.now()
 
 
-rule esp32epaperCO2
-when
-    Item Vorraum1StkCO2 changed
-then 
-    val mqttActions = getActions("mqtt","mqtt:broker:mosquitto_raspi")
-    mqttActions.publishMQTT("esp32epaper/input/CO2", Vorraum1StkCO2.state.format("%.0f"), true)
-end
+        //var date = now.format(java.time.format.DateTimeFormatter.ofPattern("yyyy-MM-dd"));
 
-rule esp32epaperWind
-when
-    Item BalkonWindgeschwindigkeit changed
-then 
-    val mqttActions = getActions("mqtt","mqtt:broker:mosquitto_raspi")
-    mqttActions.publishMQTT("esp32epaper/input/Wind", (BalkonWindgeschwindigkeit.averageSince(now.minusMinutes(30))).format("%.0f"), true)
-end
+        var date = now.format(java.time.format.DateTimeFormatter.ofPattern("E dd.MMM yyyy"));
+
+        // set time 2 minutes ahead, case rule runs on sec 57
+
+        var time = (now.plusMinutes(2)).format(java.time.format.DateTimeFormatter.ofPattern("HH:mm"));
+
+        //console.info(timestamp);
 
 
-rule esp32epaperMoonPhase 
-when 
-    Item MoonPhase changed
-    // or  Time cron "0/10 * * ? * * *"  // Every 5 secs 
-then 
-    val mqttActions = getActions("mqtt","mqtt:broker:mosquitto_raspi")
-    
-    //   "󰽢", # NEW                     NEW=🌑 Neumond
-    //   "󰽦", # WAXING_CRESCENT          WAXING_CRESCENT=🌑→🌓 zunehmender Halbmond
-    //   "󰽣", # FIRST_QUARTER           FIRST_QUARTER=🌓 erstes Viertel
-    //   "󰽥", # WAXING_GIBBOUS          WAXING_GIBBOUS=🌓→🌕 zunehmender Mond
-    //   "󰽤", # FULL                     FULL=🌕 Vollmond
-    //   "󰽧", # WANING_GIBBOUS          WANING_GIBBOUS=🌕→🌗 abnehmender Mond
-    //   "󰽡", # THIRD_QUARTER            THIRD_QUARTER=🌗 letztes Viertel
-    //   "󰽨", # WANING_CRESCENT         WANING_CRESCENT=🌗→🌑 abnehmender Halbmond
+        out = date + "#" + time + "#";
 
-	switch MoonPhase.state.toString
-	{
-		case "NEW": mqttActions.publishMQTT("esp32epaper/input/MoonPhase", "󰽢", true)
-		case "🌑 Neumond": mqttActions.publishMQTT("esp32epaper/input/MoonPhase", "󰽢", true)
-		case "WAXING_CRESCENT": mqttActions.publishMQTT("esp32epaper/input/MoonPhase", "󰽦", true)
-		case "🌑→🌓 zunehmender Halbmond": mqttActions.publishMQTT("esp32epaper/input/MoonPhase", "󰽦", true)
-		case "FIRST_QUARTER": mqttActions.publishMQTT("esp32epaper/input/MoonPhase", "󰽣", true)
-		case "🌓 erstes Viertel": mqttActions.publishMQTT("esp32epaper/input/MoonPhase", "󰽣", true)
-		case "WAXING_GIBBOUS": mqttActions.publishMQTT("esp32epaper/input/MoonPhase", "󰽥", true)
-		case "🌓→🌕 zunehmender Mond": mqttActions.publishMQTT("esp32epaper/input/MoonPhase", "󰽥", true)
-		case "FULL": mqttActions.publishMQTT("esp32epaper/input/MoonPhase", "󰽤", true)
-		case "🌕 Vollmond": mqttActions.publishMQTT("esp32epaper/input/MoonPhase", "󰽤", true)
-		case "WANING_GIBBOUS": mqttActions.publishMQTT("esp32epaper/input/MoonPhase", "󰽧", true)
-		case "🌕→🌗 abnehmender Mond": mqttActions.publishMQTT("esp32epaper/input/MoonPhase", "󰽧", true)
-		case "THIRD_QUARTER": mqttActions.publishMQTT("esp32epaper/input/MoonPhase", "󰽡", true)
-		case "🌗 letztes Viertel": mqttActions.publishMQTT("esp32epaper/input/MoonPhase", "󰽡", true)
-		case "WANING_CRESCENT": mqttActions.publishMQTT("esp32epaper/input/MoonPhase", "󰽨", true)
-		case "🌗→🌑 abnehmender Halbmond": mqttActions.publishMQTT("esp32epaper/input/MoonPhase", "󰽨", true)
-		default:
-		{   
-            mqttActions.publishMQTT("esp32epaper/input/MoonPhase", "", true)
-			logWarn ("esp32rules.rules", "Undefinierte MoonPhase!!")
-		}
-	}
+
+        // PV Power 
+
+        // averageSince returns null when PVPower is 0 ..???!! 
+
+        var PersistenceExtensions = Java.type("org.openhab.core.persistence.extensions.PersistenceExtensions");
 
 
 
-end
+        var lastValue = parseInt(items.getItem("HikingDDS2382Power").state);
+
+        //console.info("esp32rules", "PVPower lastValue value: " + lastValue);
+
+
+        //var pvPower = items.getItem("HikingDDS2382Power").history.averageSince(now.minusHours(12));
+
+        var pvPower = items.getItem("HikingDDS2382Power").history.averageSince(now.minusMinutes(1));
+
+
+        //console.info("esp32rules", "PVPower average value: " + pvPower);
+
+
+        if ((pvPower != null) && (lastValue != 0.0)) {
+          //console.info("esp32rules if", parseInt(pvPower));
+          out += parseInt(pvPower);
+        }
+
+        else {
+            //console.info("esp32ruless else", parseInt(items.getItem("HikingDDS2382Power").state));
+        	out += parseInt(items.getItem("HikingDDS2382Power").state);
+        }
+
+
+
+        // total power
+
+        //console.info("esp32rules total power: " , parseInt(items.getItem("emonAccumulatedWatts").history.averageSince(now.minusMinutes(1))));
+
+        out += "#" + parseInt(items.getItem("emonAccumulatedWatts").history.averageSince(now.minusMinutes(1)));
+
+
+        // Aussen Temperatur
+
+        out += "#" + parseFloat(items.getItem("AussenTemperatur").state).toFixed(1);
+
+
+        // Aussen Temperatur Min
+
+        out += "#" + parseFloat(items.getItem("AussenTemperaturTodayMin").state).toFixed(1);
+
+
+        // Aussen Temperatur Max
+
+        out += "#" + parseFloat(items.getItem("AussenTemperaturTodayMax").state).toFixed(1);
+
+
+        // Aussen Luftfeuchte
+
+        out += "#" + parseInt(items.getItem("AussenLuftfeuchte").state).toFixed(0);
+
+
+        // wohnzimmer temperatur
+
+        out += "#" + parseFloat(items.getItem("Aqara1Temperatur").state).toFixed(1);
+
+
+        // wohnzimmer Luftfeuchte
+
+        out += "#" + parseInt(items.getItem("Aqara1Luftfeuchte").state);
+
+
+        // bad temperatur
+
+        out += "#" + parseFloat(items.getItem("Aqara2Temperatur").state).toFixed(1);
+
+        // bad Luftfeuchte
+
+        out += "#" + parseInt(items.getItem("Aqara2Luftfeuchte").state);
+
+
+        // schlafzimmer temperatur
+
+        out += "#" + parseFloat(items.getItem("SchlafzimmerTemperatur").state).toFixed(1);
+
+        // schlafzimmer Luftfeuchte
+
+        out += "#" + parseInt(items.getItem("SchlafzimmerLuftfeuchte").state);
+
+
+        // S.Zimmer
+
+        out += "#" + parseFloat(items.getItem("Aqara3Temperatur").state).toFixed(1);
+
+        // S.Zimmer Luftfeuchte
+
+        out += "#" + parseInt(items.getItem("Aqara3Luftfeuchte").state);
+
+
+        // L.Zimmer
+
+        out += "#" + parseFloat(items.getItem("ArbeitszimmerTemperatur").state).toFixed(1);
+
+        // L.Zimmer Luftfeuchte
+
+        out += "#" + parseInt(items.getItem("ArbeitszimmerLuftfeuchte").state);
+
+
+        // CO2 Vorraum
+
+        out += "#" + parseInt(items.getItem("Vorraum1StkCO2").state);
+
+
+        // Wind
+
+        out += "#" + parseInt(items.getItem("BalkonWindgeschwindigkeit").history.averageSince(now.minusMinutes(30)));
+
+
+        // moon
+            
+        //   "󰽢", # NEW                     NEW=🌑 Neumond
+
+        //   "󰽦", # WAXING_CRESCENT          WAXING_CRESCENT=🌑→🌓 zunehmender Halbmond
+
+        //   "󰽣", # FIRST_QUARTER           FIRST_QUARTER=🌓 erstes Viertel
+
+        //   "󰽥", # WAXING_GIBBOUS          WAXING_GIBBOUS=🌓→🌕 zunehmender Mond
+
+        //   "󰽤", # FULL                     FULL=🌕 Vollmond
+
+        //   "󰽧", # WANING_GIBBOUS          WANING_GIBBOUS=🌕→🌗 abnehmender Mond
+
+        //   "󰽡", # THIRD_QUARTER            THIRD_QUARTER=🌗 letztes Viertel
+
+        //   "󰽨", # WANING_CRESCENT         WANING_CRESCENT=🌗→🌑 abnehmender Halbmond
+
+
+        //console.log("Moon phase: ", items.getItem("MoonPhase").state)
+
+
+        switch (items.getItem("MoonPhase").state) {
+            case "NEW": 
+              out += "#" +  "󰽢";
+              break;
+            case "🌑 Neumond":
+              out += "#" +  "󰽢";
+              break;
+            case "WAXING_CRESCENT": 
+              out += "#" +  "󰽦";
+              break;
+            case "🌑→🌓 zunehmender Halbmond":
+              out += "#" +  "󰽦";
+              break;
+            case "FIRST_QUARTER":
+              out += "#" +  "󰽣";
+              break;
+            case "🌓 erstes Viertel":
+              out += "#" +  "󰽣";
+              break;
+            case "WAXING_GIBBOUS":
+              out += "#" +  "󰽥";
+              break;
+            case "🌓→🌕 zunehmender Mond":
+              out += "#" +  "󰽥";
+              break;
+            case "FULL":
+              out += "#" +  "󰽤";
+              break;
+            case "🌕 Vollmond":
+              out += "#" +  "󰽤";
+              break;
+            case "WANING_GIBBOUS":
+              out += "#" +   "󰽧";
+              break;
+            case "🌕→🌗 abnehmender Mond":
+              out += "#" + "󰽧";
+              break;
+            case "THIRD_QUARTER":
+              out += "#" +  "󰽡";
+              break;
+            case "🌗 letztes Viertel":
+              out += "#" +  "󰽡";
+              break;
+            case "WANING_CRESCENT":
+              out += "#" +  "󰽨";
+              break;
+            case "🌗→🌑 abnehmender Halbmond":
+              out += "#" +  "󰽨";
+              break;
+            default:
+              out += "#" +  " ";
+              console.warn("esp32rules.rules", "Undefinierte MoonPhase!!")
+        }
+
+
+
+
+
+
+
+        var mqttActions = actions.Things.getActions("mqtt","mqtt:broker:mosquitto_raspi");
+
+        if (mqttActions === null) {
+          console.error("Actions not found, check mqtt broker");
+        } 
+
+        else {
+          
+          mqttActions.publishMQTT("esp32epaper/input/DisplayValues", out, true)
+        }
+
+
+        //                   0    1    2      3         4       5       6       7       8      9      10   11   12    13    14   15   16   17   18  19   20
+
+        //console.info("out: Date Time PVWatt TotalWatt AussenT AusTMin AusTMax AussenH WohnzT WohnzH BadT BadH SchlT SchlH SZiT SZiH LZiT LZiH CO2 Wind Mond");
+
+        //             out:  2022-02-28#14:24:57#491#-303#4.5#-1.2#4.5#39#23.5#46#23.1#59#19.9#56#19.8#57#20.5#54#1180#12
+
+        console.info("out: ", out);
+    type: script.ScriptAction
