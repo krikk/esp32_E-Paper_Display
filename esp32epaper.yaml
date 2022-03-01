@@ -18,6 +18,9 @@ esphome:
   name: $devicename
   platform: ESP32
   board: esp-wrover-kit
+  project:
+    name: "krikk.esp32_E-Paper_Display"
+    #version: "1.0.0"
   platformio_options: 
     upload_speed: 921600
     board_build.f_flash: 80000000L
@@ -35,6 +38,7 @@ esphome:
             lambda: 'return id(prevent_sleep);'
           then:
             - logger.log: "OTA Mode"
+                tag: "on_boot"
           else:
             if:
               condition:
@@ -70,6 +74,8 @@ esphome:
                   lambda: 'return id(prevent_sleep);'
                 then:
                   - logger.log: "OTA Mode"
+                      tag: "on_loop"
+                  - delay: 54s
                 else:
                   - deep_sleep.enter: deep_sleep_1
           else:
