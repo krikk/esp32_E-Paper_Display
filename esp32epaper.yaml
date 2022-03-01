@@ -10,6 +10,9 @@ globals:
     type: int
     restore_value: no
     initial_value: "0"
+  - id: globalDisplayVal
+    type: std::vector<std::string>
+    restore_value: no
     
 esphome:
   name: $devicename
@@ -54,7 +57,7 @@ esphome:
             - logger.log: "all values ready..."
             - lambda: |-
                 id(valueCount) += 1;
-                ESP_LOGD("main", "displayValues at start is: %s", id(displayValues).state.c_str());
+                ESP_LOGD("main", "mqttDisplayValues at start is: %s", id(mqttDisplayValues).state.c_str());
             # - component.update: wifisignal
             # - component.update: battery
             - component.update: my_display
@@ -110,7 +113,7 @@ mqtt:
             value: 'true'
         - deep_sleep.prevent: deep_sleep_1
     - topic: $devicename/input/refresh_display
-      payload: '1'
+      payload: 'ON'
       then:
         - component.update: my_display
     - topic: $devicename/input/sleep_mode
@@ -137,15 +140,32 @@ time:
 
 text_sensor:
   - platform: mqtt_subscribe
-    id: displayValues
+    id: mqttDisplayValues
     topic: $devicename/input/DisplayValues
     on_value:
       then:
         - lambda: |-
-            ESP_LOGD("main",  "The displayValues is: %s", id(displayValues).state.c_str());
+            ESP_LOGD("main",  "The mqttDisplayValues is: %s", id(mqttDisplayValues).state.c_str());
             ESP_LOGD("main", "Value %i before received" , id(valueCount));
             id(valueCount) += 1;
             ESP_LOGD("main", "Value %i received" , id(valueCount));
+            
+            std::string str = id(mqttDisplayValues).state;
+            id(globalDisplayVal).clear();
+            char * token;
+            char seps[] = "#";
+            token = strtok (&str[0],seps);
+            while (token != NULL)
+            {
+              id(globalDisplayVal).push_back(token);
+              token = strtok (NULL, seps);
+            }
+            /*
+            for ( std::string s : id(globalDisplayVal) ) {
+                ESP_LOGD("main: ", "String to Vector: %s", s.c_str());
+            }
+            */
+            ESP_LOGD("main: ", "String time: %s", id(globalDisplayVal).at(1).c_str());
 
 
 sensor:
@@ -323,32 +343,14 @@ display:
     id: my_display
     lambda: |
       int x, y;
-      
-      
-      
-      std::string str = id(displayValues).state;
-      std::vector<std::string> values;
-      char * token;
-      char seps[] = "#";
-      token = strtok (&str[0],seps);
-      while (token != NULL)
-      {
-        values.push_back(token);
-        token = strtok (NULL, seps);
-      }
-      /*
-      for ( std::string s : values ) {
-          ESP_LOGD("test: ", "String to Vector: %s", s.c_str());
-      }
-      
-      ESP_LOGD("test: ", "String time: %s", values.at(1).c_str());
-      */
- 
- 
+
+      //                   0    1    2      3         4       5       6       7       8      9      10   11   12    13    14   15   16   17   18  19   20
+      //console.info("out: Date Time PVWatt TotalWatt AussenT AusTMin AusTMax AussenH WohnzT WohnzH BadT BadH SchlT SchlH SZiT SZiH LZiT LZiH CO2 Wind Mond");
+      //             out:  2022-02-28#14:24:57#491#-303#4.5#-1.2#4.5#39#23.5#46#23.1#59#19.9#56#19.8#57#20.5#54#1180#12
 
       /* Print time in HH:MM format */
-      it.printf(400, 495, id(clock_font), TextAlign::BOTTOM_CENTER, "%s", values.at(1).c_str());
-      it.printf(245, 400, id(font_55), TextAlign::BOTTOM_LEFT, "%s", values.at(0).c_str());
+      it.printf(400, 495, id(clock_font), TextAlign::BOTTOM_CENTER, "%s", id(globalDisplayVal).at(1).c_str());
+      it.printf(245, 400, id(font_55), TextAlign::BOTTOM_LEFT, "%s", id(globalDisplayVal).at(0).c_str());
 
       
       /* WiFi Signal Strenght 
@@ -416,78 +418,78 @@ display:
       
       // pv power
       it.print(645, 480, id(icon_70), TextAlign::BOTTOM_RIGHT, "󰩲");
-      it.printf(800, 480, id(font_55), TextAlign::BOTTOM_RIGHT , "%sW", values.at(2).c_str());
+      it.printf(800, 480, id(font_55), TextAlign::BOTTOM_RIGHT , "%sW", id(globalDisplayVal).at(2).c_str());
 
       
       // total power
       it.print(-13, 480, id(icon_70), TextAlign::BOTTOM_LEFT, "󰚥");
-      it.printf(45, 480, id(font_55), TextAlign::BOTTOM_LEFT , "%sW", values.at(3).c_str());
+      it.printf(45, 480, id(font_55), TextAlign::BOTTOM_LEFT , "%sW", id(globalDisplayVal).at(3).c_str());
 
       // outside temperature 
       it.print(400, 0, id(font_30), TextAlign::TOP_LEFT, "OUT:"); 
-      it.printf(800, -19, id(font_100), TextAlign::TOP_RIGHT, "%s°C", values.at(4).c_str());
+      it.printf(800, -19, id(font_100), TextAlign::TOP_RIGHT, "%s°C", id(globalDisplayVal).at(4).c_str());
 
       // outside min temperature 
       it.print(400, 120, id(icon_40), TextAlign::CENTER_LEFT, "󰸂"); 
-      it.printf(440, 120, id(font_40), TextAlign::CENTER_LEFT, "%s°C", values.at(5).c_str());
+      it.printf(440, 120, id(font_40), TextAlign::CENTER_LEFT, "%s°C", id(globalDisplayVal).at(5).c_str());
 
       // outside max temperature 
       it.print(678, 120, id(icon_40), TextAlign::CENTER_RIGHT, "󰸃"); 
-      it.printf(800, 120, id(font_40), TextAlign::CENTER_RIGHT, "%s°C", values.at(6).c_str());
+      it.printf(800, 120, id(font_40), TextAlign::CENTER_RIGHT, "%s°C", id(globalDisplayVal).at(6).c_str());
       
       // outside humidity
       it.printf(812, 200, id(icon_55), TextAlign::CENTER_RIGHT, "󰖎"); 
-      it.printf(766, 200, id(font_55), TextAlign::CENTER_RIGHT, "%s", values.at(7).c_str());
+      it.printf(766, 200, id(font_55), TextAlign::CENTER_RIGHT, "%s", id(globalDisplayVal).at(7).c_str());
 
       //  livingroom temperature
       it.print(0, 35, id(icon_70), TextAlign::CENTER_LEFT, "󱕭");
-      it.printf(90, 35, id(font_40), TextAlign::CENTER_LEFT , "%s°", values.at(8).c_str());
+      it.printf(90, 35, id(font_40), TextAlign::CENTER_LEFT , "%s°", id(globalDisplayVal).at(8).c_str());
       // livingroom humidity
       it.printf(315, 35, id(icon_40), TextAlign::CENTER_RIGHT, "󰖎"); 
-      it.printf(235, 35, id(font_40), TextAlign::CENTER_LEFT , "%s", values.at(9).c_str());
+      it.printf(235, 35, id(font_40), TextAlign::CENTER_LEFT , "%s", id(globalDisplayVal).at(9).c_str());
 
       // Bath temperature
       it.print(0, 105, id(icon_70), TextAlign::CENTER_LEFT, "󰦠");
-      it.printf(90, 105, id(font_40), TextAlign::CENTER_LEFT , "%s°", values.at(10).c_str());
+      it.printf(90, 105, id(font_40), TextAlign::CENTER_LEFT , "%s°", id(globalDisplayVal).at(10).c_str());
       // bath humitidy
       it.printf(315, 105, id(icon_40), TextAlign::CENTER_RIGHT, "󰖎"); 
-      it.printf(235, 105, id(font_40), TextAlign::CENTER_LEFT , "%s", values.at(11).c_str());
+      it.printf(235, 105, id(font_40), TextAlign::CENTER_LEFT , "%s", id(globalDisplayVal).at(11).c_str());
 
       // bedroom temperature
       it.print(0, 175, id(icon_70), TextAlign::CENTER_LEFT, "󰿑");
-      it.printf(90, 175, id(font_40), TextAlign::CENTER_LEFT , "%s°", values.at(12).c_str());
+      it.printf(90, 175, id(font_40), TextAlign::CENTER_LEFT , "%s°", id(globalDisplayVal).at(12).c_str());
       // bedroom humidity
       it.printf(315, 175, id(icon_40), TextAlign::CENTER_RIGHT, "󰖎"); 
-      it.printf(235, 175, id(font_40), TextAlign::CENTER_LEFT , "%s", values.at(13).c_str());
+      it.printf(235, 175, id(font_40), TextAlign::CENTER_LEFT , "%s", id(globalDisplayVal).at(13).c_str());
 
       // boys-room temperature
       it.print(0, 245, id(icon_70), TextAlign::CENTER_LEFT, "󰙍");
-      it.printf(90, 245, id(font_40), TextAlign::CENTER_LEFT , "%s°", values.at(14).c_str());
+      it.printf(90, 245, id(font_40), TextAlign::CENTER_LEFT , "%s°", id(globalDisplayVal).at(14).c_str());
       // boys-room humidity
       it.printf(315, 245, id(icon_40), TextAlign::CENTER_RIGHT, "󰖎"); 
-      it.printf(235, 245, id(font_40), TextAlign::CENTER_LEFT , "%s", values.at(15).c_str());
+      it.printf(235, 245, id(font_40), TextAlign::CENTER_LEFT , "%s", id(globalDisplayVal).at(15).c_str());
       
       // girl-room temperature
       it.print(0, 315, id(icon_70), TextAlign::CENTER_LEFT, "󰙉");
-      it.printf(90, 315, id(font_40), TextAlign::CENTER_LEFT , "%s°", values.at(16).c_str());
+      it.printf(90, 315, id(font_40), TextAlign::CENTER_LEFT , "%s°", id(globalDisplayVal).at(16).c_str());
       // girl-room humidity
       it.printf(315, 315, id(icon_40), TextAlign::CENTER_RIGHT, "󰖎"); 
-      it.printf(235, 315, id(font_40), TextAlign::CENTER_LEFT , "%s", values.at(17).c_str());
+      it.printf(235, 315, id(font_40), TextAlign::CENTER_LEFT , "%s", id(globalDisplayVal).at(17).c_str());
 
 
       /* CO2 icon */
       it.print(666, 280, id(icon_70), TextAlign::CENTER_RIGHT, "󰟤"); 
-      it.printf(773, 280, id(font_55), TextAlign::CENTER_RIGHT, "%s", values.at(18).c_str());
+      it.printf(773, 280, id(font_55), TextAlign::CENTER_RIGHT, "%s", id(globalDisplayVal).at(18).c_str());
       it.printf(800, 300, id(font_14), TextAlign::BASELINE_RIGHT, "ppm");
 
       /* wind */
       it.print(400, 280, id(icon_70), TextAlign::CENTER_LEFT, "󱗺"); 
-      it.printf(525, 280, id(font_55), TextAlign::CENTER_RIGHT, "%s", values.at(19).c_str());
+      it.printf(525, 280, id(font_55), TextAlign::CENTER_RIGHT, "%s", id(globalDisplayVal).at(19).c_str());
       it.printf(525, 280, id(font_14), TextAlign::CENTER_LEFT, "km/h");
 
       /* Moon icon */
       //ESP_LOGI("Moon icon", "%s", id(moonPhase).state.c_str());
-      it.printf(800, 360, id(icon_70), TextAlign::CENTER_RIGHT, "%s", values.at(20).c_str());
+      it.printf(800, 360, id(icon_70), TextAlign::CENTER_RIGHT, "%s", id(globalDisplayVal).at(20).c_str());
       
       // it.line(0, 299, 400, 299);
 
