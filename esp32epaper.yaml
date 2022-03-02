@@ -53,34 +53,6 @@ esphome:
                 - logger.log: "daytime..."
                 - lambda: 'id(deep_sleep_1).set_sleep_duration(60*1000);'
                 # - deep_sleep.enter: deep_sleep_1      
-  on_loop:
-    then:
-      - if:
-          condition:
-            lambda: 'return (id(valueCount) == 1);'  # all would be 19
-          then:
-            - logger.log: "all values ready..."
-            - lambda: |-
-                id(valueCount) += 1;
-                ESP_LOGD("main", "mqttDisplayValues at start is: %s", id(mqttDisplayValues).state.c_str());
-            # - component.update: wifisignal
-            # - component.update: battery
-            - component.update: my_display
-            # - lambda: 'WiFi.mode(WIFI_OFF);'
-            - logger.log: "waiting 6s..."
-            - delay: 6s
-            - logger.log: "6s later."
-            - if:
-                condition:
-                  lambda: 'return id(prevent_sleep);'
-                then:
-                  - logger.log: "OTA Mode"
-                      tag: "on_loop"
-                  - delay: 54s
-                else:
-                  - deep_sleep.enter: deep_sleep_1
-          else:
-            #- logger.log: "waiting for values..."
 
   on_shutdown:
     then:
@@ -105,32 +77,10 @@ mqtt:
     payload: Offline
 
   on_message: # Manueller refresh des Displays bei Änderung
-    - topic: $devicename/input/ota_mode
-      payload: '1'
-      then:
-        - globals.set:
-            id: prevent_sleep
-            value: 'true'
-        - deep_sleep.prevent: deep_sleep_1
-    - topic: $devicename/input/ota_mode
-      payload: 'ON'
-      then:
-        - globals.set:
-            id: prevent_sleep
-            value: 'true'
-        - deep_sleep.prevent: deep_sleep_1
     - topic: $devicename/input/refresh_display
       payload: 'ON'
       then:
         - component.update: my_display
-    - topic: $devicename/input/sleep_mode
-      payload: '1'
-      then:
-        - deep_sleep.enter: deep_sleep_1
-    - topic: $devicename/input/sleep_mode
-      payload: 'ON'
-      then:
-        - deep_sleep.enter: deep_sleep_1
 
 # Enable logging
 logger:
@@ -152,10 +102,9 @@ text_sensor:
     on_value:
       then:
         - lambda: |-
-            ESP_LOGD("main",  "The mqttDisplayValues is: %s", id(mqttDisplayValues).state.c_str());
-            ESP_LOGD("main", "Value %i before received" , id(valueCount));
+            ESP_LOGD("mqttDisplayValues",  "The mqttDisplayValues is: %s", id(mqttDisplayValues).state.c_str());
             id(valueCount) += 1;
-            ESP_LOGD("main", "Value %i received" , id(valueCount));
+            ESP_LOGD("mqttDisplayValues", "Value %i:" , id(valueCount));
             
             std::string str = id(mqttDisplayValues).state;
             id(globalDisplayVal).clear();
@@ -169,10 +118,40 @@ text_sensor:
             }
             /*
             for ( std::string s : id(globalDisplayVal) ) {
-                ESP_LOGD("main: ", "String to Vector: %s", s.c_str());
+                ESP_LOGD("mqttDisplayValues: ", "String to Vector: %s", s.c_str());
             }
+            
+            ESP_LOGD("mqttDisplayValues: ", "String time: %s", id(globalDisplayVal).at(1).c_str());
+            ESP_LOGD("mqttDisplayValues: ", "String Sleeptime: %s", id(globalDisplayVal).at(22).c_str());
+            ESP_LOGD("mqttDisplayValues: ", "String OTA: %s", id(globalDisplayVal).at(23).c_str());
             */
-            ESP_LOGD("main: ", "String time: %s", id(globalDisplayVal).at(1).c_str());
+            if (id(globalDisplayVal).at(23) == "ON") {
+              id(prevent_sleep) = true;
+              id(deep_sleep_1).prevent_deep_sleep();
+              ESP_LOGD("mqttDisplayValues: ", "OTA: ON");
+            }
+            else {
+              id(prevent_sleep) = false;
+              ESP_LOGD("mqttDisplayValues: ", "OTA: OFF");
+            }
+            
+            
+
+        - component.update: my_display
+        # - lambda: 'WiFi.mode(WIFI_OFF);'
+        - logger.log: "waiting 6s..."
+        - delay: 6s
+        - logger.log: "6s later."
+        - if:
+            condition:
+              lambda: 'return id(prevent_sleep);'
+            then:
+              - logger.log:
+                  format: "OTA Mode"
+                  tag: "mqttDisplayValues"
+              - delay: 54s
+            else:
+              - deep_sleep.enter: deep_sleep_1
 
 
 sensor:
@@ -189,7 +168,7 @@ sensor:
     attenuation: 11db
     id: battery
     name: "Battery Voltage"
-    update_interval: 5min
+    update_interval: never
     # filters:
     # - calibrate_linear:
           # Map 0.0 (from sensor) to 0.0 (true value)
@@ -215,7 +194,7 @@ font:
   - file: 'fonts/Google_Sans_Medium.ttf'
     id: font_14
     size: 14
-    glyphs: [k, m, /, h, p]
+    glyphs: [k, m, /, h, p, 3]
   - file: 'fonts/Google_Sans_Medium.ttf'
     id: font_40
     size: 40
@@ -512,6 +491,6 @@ display:
 # Example configuration entry
 deep_sleep:
   run_duration: 15s
-  sleep_duration: 2min
+  sleep_duration: 30s
   id: deep_sleep_1
 
