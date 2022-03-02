@@ -76,12 +76,6 @@ mqtt:
     topic: tele/$devicename/LWT
     payload: Offline
 
-  on_message: # Manueller refresh des Displays bei Änderung
-    - topic: $devicename/input/refresh_display
-      payload: 'ON'
-      then:
-        - component.update: my_display
-
 # Enable logging
 logger:
   level: DEBUG
