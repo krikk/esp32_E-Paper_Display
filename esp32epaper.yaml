@@ -498,6 +498,13 @@ display:
       //ESP_LOGI("Moon icon", "%s", id(moonPhase).state.c_str());
       it.printf(800, 360, id(icon_70), TextAlign::CENTER_RIGHT, "%s", id(globalDisplayVal).at(20).c_str());
       
+      /* rain next 3 h */
+      it.print(400, 190, id(icon_70), TextAlign::CENTER_LEFT, "󰕊"); 
+      it.printf(550, 190, id(font_55), TextAlign::CENTER_RIGHT, "%s", id(globalDisplayVal).at(21).c_str());
+      it.printf(555, 190, id(font_14), TextAlign::CENTER_LEFT, "mm");
+      it.printf(444, 200, id(font_14), TextAlign::CENTER_LEFT, "3h");
+            
+            
       // it.line(0, 299, 400, 299);
 
 
