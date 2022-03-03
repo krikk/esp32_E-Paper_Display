@@ -27,12 +27,9 @@ esphome:
   on_boot:
     priority: -100
     then:
-      - logger.log: "boot ready..."
-      # - delay: 1s
-      # - logger.log: "delayed 1s... update display"
-      # - component.update: my_display      
-      # - delay: 6s
-      # - logger.log: "delayed 6s..."
+      - logger.log: 
+          format: "boot ready..."
+          tag: "on_boot"
       - if:
           condition:
             lambda: 'return id(prevent_sleep);'
@@ -41,19 +38,10 @@ esphome:
                 format: "OTA Mode"
                 tag: "on_boot"
           else:
-            if:
-              condition:
-                # adjust sleep time to hour of the day
-                lambda: 'return ((id(current_time).now().hour < 6) || (id(current_time).now().hour > 22)) ;'
-              then:
-                - logger.log: "nighttime..."
-                - lambda: 'id(deep_sleep_1).set_sleep_duration(5*60*1000);'
-                # - deep_sleep.enter: deep_sleep_1
-              else:
-                - logger.log: "daytime..."
-                - lambda: 'id(deep_sleep_1).set_sleep_duration(60*1000);'
-                # - deep_sleep.enter: deep_sleep_1      
-
+            - logger.log:
+                format: "Sleep Mode"
+                tag: "on_boot"
+ 
   on_shutdown:
     then:
       - lambda: "adc_power_off(); my_display->deep_sleep();"
@@ -82,13 +70,6 @@ logger:
   # level: ERROR
 
 
-time:
- - platform: sntp
-   id: current_time
-   timezone: Europe/Vienna
-   servers : 192.168.11.1
-
-
 text_sensor:
   - platform: mqtt_subscribe
     id: mqttDisplayValues
@@ -112,22 +93,25 @@ text_sensor:
             }
             /*
             for ( std::string s : id(globalDisplayVal) ) {
-                ESP_LOGD("mqttDisplayValues: ", "String to Vector: %s", s.c_str());
+                ESP_LOGD("mqttDisplayValues", "String to Vector: %s", s.c_str());
             }
-            
-            ESP_LOGD("mqttDisplayValues: ", "String time: %s", id(globalDisplayVal).at(1).c_str());
-            ESP_LOGD("mqttDisplayValues: ", "String Sleeptime: %s", id(globalDisplayVal).at(22).c_str());
-            ESP_LOGD("mqttDisplayValues: ", "String OTA: %s", id(globalDisplayVal).at(23).c_str());
-            */
+            */            
+            ESP_LOGD("mqttDisplayValues", "String time: %s", id(globalDisplayVal).at(1).c_str());
+            ESP_LOGD("mqttDisplayValues", "String Sleeptime: %s", id(globalDisplayVal).at(22).c_str());
+            ESP_LOGD("mqttDisplayValues", "String OTA: %s", id(globalDisplayVal).at(23).c_str());
+
             if (id(globalDisplayVal).at(23) == "ON") {
               id(prevent_sleep) = true;
               id(deep_sleep_1).prevent_deep_sleep();
-              ESP_LOGD("mqttDisplayValues: ", "OTA: ON");
+              ESP_LOGD("mqttDisplayValues", "OTA: ON");
             }
             else {
               id(prevent_sleep) = false;
-              ESP_LOGD("mqttDisplayValues: ", "OTA: OFF");
+              ESP_LOGD("mqttDisplayValues", "OTA: OFF");
             }
+            // set deep sleep time in seconds
+            int sleepsec = atoi( id(globalDisplayVal).at(22).c_str());
+            id(deep_sleep_1).set_sleep_duration(sleepsec*1000);
             
             
 
@@ -485,6 +469,6 @@ display:
 # Example configuration entry
 deep_sleep:
   run_duration: 15s
-  sleep_duration: 30s
+  sleep_duration: 33s
   id: deep_sleep_1
 
