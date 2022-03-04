@@ -232,16 +232,39 @@ actions:
         out += "#" + parseFloat(items.getItem("gOpenWeatherMap_ForecastHours03_Rain").state);
 
 
-        // sleeptime in sec
+        // sleeptime in sec, longer sleep time in night
 
-        out += "#" + 60;
+        var hours = parseInt(now.format(java.time.format.DateTimeFormatter.ofPattern("HH")));
+
+        if (hours >=23 || hours < 7) {
+          out += "#" + 5*60;
+        }
+
+        else {
+            out += "#" + 60;
+        }
 
 
         // esp32E-Paper display OTA mode
 
-        out += "#" + items.getItem("esp32epaperOtaMode").state;
 
-        //console.log("OTA: ", items.getItem("esp32epaperOtaMode").state);
+        out += "#" + ((items.getItem("esp32epaperOtaMode").state == "OFF") ? "0" : "1");
+
+        //console.log("OTA: ", (items.getItem("esp32epaperOtaMode").state == "OFF") ? "0" : "1");
+
+
+        // set to 1 to read battery voltage & wifi signal sensor
+
+        // read battery sensor every full hour
+
+        var minutes = now.format(java.time.format.DateTimeFormatter.ofPattern("mm"));
+
+        //console.log("minutes", minutes);
+
+        out += "#" + ( minutes == "59" ? "1" : "0");
+
+        //out += "#" + "1";
+
 
 
 
@@ -258,11 +281,12 @@ actions:
         }
 
 
-        //                   0    1    2      3         4       5       6       7       8      9      10   11   12    13    14   15   16   17   18  19   20   21       22     23
+        //                   0    1    2      3         4       5       6       7       8      9      10   11   12    13    14   15   16   17   18  19   20   21       22     23  24
 
-        //console.info("out: Date Time PVWatt TotalWatt AussenT AusTMin AusTMax AussenH WohnzT WohnzH BadT BadH SchlT SchlH SZiT SZiH LZiT LZiH CO2 Wind Mond RainForc SleepT OTA");
+        //console.info("out: Date Time PVWatt TotalWatt AussenT AusTMin AusTMax AussenH WohnzT WohnzH BadT BadH SchlT SchlH SZiT SZiH LZiT LZiH CO2 Wind Mond RainForc SleepT OTA ReadBatt");
 
-        //             out:   Wed 02.Mar 2022#21:21#0#220#1.7#1.7#6.5#41#23.1#47#23.8#80#19.5#54#19.2#57#20.1#51#610#4#󰽢#0
+        //             out:   Fri 4.Mar 2022#21:36#0#195#2.3#2.3#5.2#67#21.9#41#22.8#71#18.1#54#17.5#52#18.5#48#956#1#󰽦#0#30#0#0
+
 
         console.info("out: ", out);
     type: script.ScriptAction
