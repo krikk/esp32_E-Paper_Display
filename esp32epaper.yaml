@@ -95,31 +95,38 @@ text_sensor:
             for ( std::string s : id(globalDisplayVal) ) {
                 ESP_LOGD("mqttDisplayValues", "String to Vector: %s", s.c_str());
             }
-            */            
             ESP_LOGD("mqttDisplayValues", "String time: %s", id(globalDisplayVal).at(1).c_str());
             ESP_LOGD("mqttDisplayValues", "String Sleeptime: %s", id(globalDisplayVal).at(22).c_str());
             ESP_LOGD("mqttDisplayValues", "String OTA: %s", id(globalDisplayVal).at(23).c_str());
-
-            if (id(globalDisplayVal).at(23) == "ON") {
+            */
+            
+            // activate OTA mode if requested
+            if (id(globalDisplayVal).at(23) == "1") {
               id(prevent_sleep) = true;
               id(deep_sleep_1).prevent_deep_sleep();
-              ESP_LOGD("mqttDisplayValues", "OTA: ON");
+              ESP_LOGD("mqttDisplayValues", "OTA: 1");
             }
             else {
               id(prevent_sleep) = false;
-              ESP_LOGD("mqttDisplayValues", "OTA: OFF");
+              ESP_LOGD("mqttDisplayValues", "OTA: 0");
             }
             // set deep sleep time in seconds
             int sleepsec = atoi( id(globalDisplayVal).at(22).c_str());
             id(deep_sleep_1).set_sleep_duration(sleepsec*1000);
-            
+  
+            // update battery and wifi sensor when requested
+            if (id(globalDisplayVal).at(24) == "1") {
+              id(battery).update();
+              id (wifisignal).update();
+              ESP_LOGD("mqttDisplayValues", "Sensors Battery Voltage and Wifi signal updated.");
+            }
+
             
 
         - component.update: my_display
         # - lambda: 'WiFi.mode(WIFI_OFF);'
-        - logger.log: "waiting 6s..."
+        - logger.log: "waiting 6s for display update..."
         - delay: 6s
-        - logger.log: "6s later."
         - if:
             condition:
               lambda: 'return id(prevent_sleep);'
@@ -136,22 +143,23 @@ sensor:
 #  - platform: uptime
 #    name: "$devicename Uptime Sensor"
 
-#  - platform: wifi_signal
-#    name: "$devicename WiFi Signal Sensor"
-#    id: wifisignal
-#    update_interval: 5min
+  - platform: wifi_signal
+    name: "WiFi Signal"
+    id: wifisignal
+    update_interval: never
 
   - platform: adc
     pin: GPIO36
-    attenuation: 11db
+    #attenuation: 11db
+    attenuation: auto 
     id: battery
     name: "Battery Voltage"
     update_interval: never
     # filters:
     # - calibrate_linear:
           # Map 0.0 (from sensor) to 0.0 (true value)
-          # - 3.3 -> 100
-          # - 0 -> 0
+          # - 2.62 -> 100
+          # - 1.56 -> 0
 
 spi:
   clk_pin: GPIO19
