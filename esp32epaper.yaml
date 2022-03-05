@@ -125,8 +125,9 @@ text_sensor:
 
         - component.update: my_display
         # - lambda: 'WiFi.mode(WIFI_OFF);'
-        - logger.log: "waiting 6s for display update..."
-        - delay: 6s
+        - lambda: 'setCpuFrequencyMhz(40);'
+        - logger.log: "waiting 5s for display update..."
+        - delay: 5s
         - if:
             condition:
               lambda: 'return id(prevent_sleep);'
