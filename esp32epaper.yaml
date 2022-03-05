@@ -206,9 +206,9 @@ font:
        'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't',
        'u', 'v', 'w', 'x', 'y', 'z', 'å', 'ä', 'ö', '/']
 
-  # Preview https://pictogrammers.github.io/@mdi/font/5.9.55/
-  # Download: https://cdnjs.com/libraries/MaterialDesign-Webfont       
-  - file: 'fonts/materialdesignicons-webfont_5.9.55.ttf'
+  # Preview https://pictogrammers.github.io/@mdi/font/6.5.95/
+  # Download: https://cdnjs.com/libraries/MaterialDesign-Webfont/6.5.95
+  - file: 'fonts/materialdesignicons-webfont_6.5.95.ttf'
     id: weather_font
     size: 50
     glyphs: [
@@ -233,9 +233,9 @@ font:
       '󰁹', # F0079 mdi-battery 100
       ]
 
-  # Preview https://pictogrammers.github.io/@mdi/font/5.9.55/
-  # Download: https://cdnjs.com/libraries/MaterialDesign-Webfont
-  - file: 'fonts/materialdesignicons-webfont_5.9.55.ttf'
+  # Preview https://pictogrammers.github.io/@mdi/font/6.5.95/
+  # Download: https://cdnjs.com/libraries/MaterialDesign-Webfont/6.5.95
+  - file: 'fonts/materialdesignicons-webfont_6.5.95.ttf'
     id: icon_70
     size: 70
     glyphs: [
@@ -288,7 +288,7 @@ font:
       ]
 
 
-  - file: 'fonts/materialdesignicons-webfont_5.9.55.ttf'
+  - file: 'fonts/materialdesignicons-webfont_6.5.95.ttf'
     id: icon_40
     size: 40
     glyphs: [
@@ -297,7 +297,7 @@ font:
       '󰖎', # F058E mdi-water-percent
       ]
 
-  - file: 'fonts/materialdesignicons-webfont_5.9.55.ttf'
+  - file: 'fonts/materialdesignicons-webfont_6.5.95.ttf'
     id: icon_55
     size: 55
     glyphs: [
