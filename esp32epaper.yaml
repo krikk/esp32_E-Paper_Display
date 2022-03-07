@@ -6,13 +6,14 @@ globals:
     type: bool
     restore_value: no
     initial_value: "false"
-  - id: valueCount
-    type: int
-    restore_value: no
-    initial_value: "0"
   - id: globalDisplayVal
     type: std::vector<std::string>
     restore_value: no
+  - id: displayWaitTime
+    type: int
+    initial_value: '5000'
+    restore_value: no
+
     
 esphome:
   name: $devicename
@@ -27,6 +28,7 @@ esphome:
   on_boot:
     priority: -100
     then:
+      - lambda: "adc_power_acquire();"
       - logger.log: 
           format: "boot ready..."
           tag: "on_boot"
@@ -44,7 +46,8 @@ esphome:
  
   on_shutdown:
     then:
-      - lambda: "adc_power_off(); my_display->deep_sleep();"
+#      - lambda: "adc_power_off(); my_display->deep_sleep();"
+      - lambda: "adc_power_release(); my_display->deep_sleep();"
 
 packages:
   wifi: !include wifi.yaml
@@ -78,8 +81,6 @@ text_sensor:
       then:
         - lambda: |-
             ESP_LOGD("mqttDisplayValues",  "The mqttDisplayValues is: %s", id(mqttDisplayValues).state.c_str());
-            id(valueCount) += 1;
-            ESP_LOGD("mqttDisplayValues", "Value %i:" , id(valueCount));
             
             std::string str = id(mqttDisplayValues).state;
             id(globalDisplayVal).clear();
@@ -121,13 +122,22 @@ text_sensor:
               ESP_LOGD("mqttDisplayValues", "Sensors Battery Voltage and Wifi signal updated.");
             }
 
+            // update display only when presense is set to 1
+            if (id(globalDisplayVal).at(25) == "1") {
+              id(my_display).update();
+              ESP_LOGD("mqttDisplayValues", "updating Display...");
+              ESP_LOGD("mqttDisplayValues", "displayWaitTime if is: %d", id(displayWaitTime));
+            }
+            else {
+              id(displayWaitTime) = 0;
+              ESP_LOGD("mqttDisplayValues", "displayWaitTime else is: %d", id(displayWaitTime));
+
+            }
+            ESP_LOGD("mqttDisplayValues", "String Update Display is: %s", id(globalDisplayVal).at(25).c_str());
+            
             
 
-        - component.update: my_display
-        # - lambda: 'WiFi.mode(WIFI_OFF);'
-        - lambda: 'setCpuFrequencyMhz(40);'
-        - logger.log: "waiting 5s for display update..."
-        - delay: 5s
+        - delay: !lambda 'return id(displayWaitTime);'
         - if:
             condition:
               lambda: 'return id(prevent_sleep);'
