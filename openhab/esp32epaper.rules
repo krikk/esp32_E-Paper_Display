@@ -24,9 +24,9 @@ actions:
 
         var date = now.format(java.time.format.DateTimeFormatter.ofPattern("E d.MMM yyyy"));
 
-        // set time 2 minutes ahead, case rule runs on sec 57
+        // set time 1 minutes ahead, case rule runs on sec 57
 
-        var time = (now.plusMinutes(2)).format(java.time.format.DateTimeFormatter.ofPattern("HH:mm"));
+        var time = (now.plusMinutes(1)).format(java.time.format.DateTimeFormatter.ofPattern("HH:mm"));
 
         //console.info(timestamp);
 
@@ -247,7 +247,6 @@ actions:
 
         // esp32E-Paper display OTA mode
 
-
         out += "#" + ((items.getItem("esp32epaperOtaMode").state == "OFF") ? "0" : "1");
 
         //console.log("OTA: ", (items.getItem("esp32epaperOtaMode").state == "OFF") ? "0" : "1");
@@ -261,12 +260,23 @@ actions:
 
         //console.log("minutes", minutes);
 
-        out += "#" + ( minutes == "59" ? "1" : "0");
+        out += "#" + ( minutes == "00" ? "1" : "0");
 
         //out += "#" + "1";
 
 
 
+        if (items.getItem("esp32epaperOtaMode").state == "ON") {
+          // always update display in OTA mode
+          out += "#" +  "5100";
+        }
+
+        else {
+          // esp32E-Paper update display: if Presence is OFF, do not update display
+          // if Presence is ON, set wait time after Display refresh normally > 5000ms
+          out += "#" + ((items.getItem("UnknownPresence").state == "OFF") ? "0" : "5100");
+          //out += "#" +  "0";
+        }
 
 
         var mqttActions = actions.Things.getActions("mqtt","mqtt:broker:mosquitto_raspi");
@@ -281,11 +291,11 @@ actions:
         }
 
 
-        //                   0    1    2      3         4       5       6       7       8      9      10   11   12    13    14   15   16   17   18  19   20   21       22     23  24
+        //                   0    1    2      3         4       5       6       7       8      9      10   11   12    13    14   15   16   17   18  19   20   21       22     23  24       25
 
-        //console.info("out: Date Time PVWatt TotalWatt AussenT AusTMin AusTMax AussenH WohnzT WohnzH BadT BadH SchlT SchlH SZiT SZiH LZiT LZiH CO2 Wind Mond RainForc SleepT OTA ReadBatt");
+        //console.info("out: Date Time PVWatt TotalWatt AussenT AusTMin AusTMax AussenH WohnzT WohnzH BadT BadH SchlT SchlH SZiT SZiH LZiT LZiH CO2 Wind Mond RainForc SleepT OTA ReadBatt UpdDisplay");
 
-        //             out:   Fri 4.Mar 2022#21:36#0#195#2.3#2.3#5.2#67#21.9#41#22.8#71#18.1#54#17.5#52#18.5#48#956#1#󰽦#0#30#0#0
+        //             out:   Mon 7.Mar 2022#13:00#53#185#1.5#-0.4#1.8#47#22.0#48#22.8#66#19.0#58#19.3#55#19.4#54#1179#12#󰽦#0#60#0#0#1
 
 
         console.info("out: ", out);

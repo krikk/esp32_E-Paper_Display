@@ -29,9 +29,6 @@ esphome:
     priority: -100
     then:
       - lambda: "adc_power_acquire();"
-      - logger.log: 
-          format: "boot ready..."
-          tag: "on_boot"
       - if:
           condition:
             lambda: 'return id(prevent_sleep);'
@@ -70,7 +67,7 @@ mqtt:
 # Enable logging
 logger:
   level: DEBUG
-  # level: ERROR
+  #level: INFO
 
 
 text_sensor:
@@ -123,18 +120,16 @@ text_sensor:
             }
 
             // update display only when presense is set to 1
-            if (id(globalDisplayVal).at(25) == "1") {
+            if (id(globalDisplayVal).at(25) != "0") {
               id(my_display).update();
-              ESP_LOGD("mqttDisplayValues", "updating Display...");
-              ESP_LOGD("mqttDisplayValues", "displayWaitTime if is: %d", id(displayWaitTime));
+              id(displayWaitTime) = atoi( id(globalDisplayVal).at(25).c_str());
+              ESP_LOGD("mqttDisplayValues", "updating Display, displayWaitTime is: %d", id(displayWaitTime));
             }
             else {
               id(displayWaitTime) = 0;
               ESP_LOGD("mqttDisplayValues", "displayWaitTime else is: %d", id(displayWaitTime));
 
             }
-            ESP_LOGD("mqttDisplayValues", "String Update Display is: %s", id(globalDisplayVal).at(25).c_str());
-            
             
 
         - delay: !lambda 'return id(displayWaitTime);'
