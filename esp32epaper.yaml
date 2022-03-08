@@ -21,7 +21,7 @@ esphome:
   board: esp-wrover-kit
   project:
     name: "krikk.esp32_E-Paper_Display"
-    version: "0.0.12"
+    version: "0.0.13"
   platformio_options: 
     upload_speed: 921600
     board_build.f_flash: 80000000L
@@ -29,17 +29,6 @@ esphome:
     priority: -100
     then:
       - lambda: "adc_power_acquire();"
-      - if:
-          condition:
-            lambda: 'return id(prevent_sleep);'
-          then:
-            - logger.log:
-                format: "OTA Mode"
-                tag: "on_boot"
-          else:
-            - logger.log:
-                format: "Sleep Mode"
-                tag: "on_boot"
  
   on_shutdown:
     then:
@@ -123,7 +112,7 @@ text_sensor:
             if (id(globalDisplayVal).at(25) != "0") {
               id(my_display).update();
               id(displayWaitTime) = atoi( id(globalDisplayVal).at(25).c_str());
-              ESP_LOGD("mqttDisplayValues", "updating Display, displayWaitTime is: %d", id(displayWaitTime));
+              ESP_LOGD("mqttDisplayValues", "updating Display, displayWaitTime is: %d ms", id(displayWaitTime));
             }
             else {
               id(displayWaitTime) = 0;
