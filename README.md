@@ -10,7 +10,7 @@ But as I am a OpenHAB user, it is all based on MQTT, and this is still work in p
 
 Used Hardware:
 - Custom build wooden Case (thanks to my father!)
-- [Thingpulse ePulse – Low Power ESP32 development board](https://thingpulse.com/product/epulse-low-power-esp32-development-board/) 
+- [Thingpulse ePulse – Low Power ESP32 development board](https://thingpulse.com/product/epulse-low-power-esp32-development-board/) or newer (better) alternative: [ThingPulse ePulse Feather Board](https://thingpulse.com/product/epulse-feather-low-power-esp32-development-board/) (beware this accepts only loper voltage)
 - [Waveshare 7.5inch e-Paper HAT](https://www.waveshare.com/wiki/7.5inch_e-Paper_HAT)
 - 3 x [18650 Battery Holder](https://www.aliexpress.com/item/4000066839172.html)
 - 6 x [Liitokala 18650 3400mAh Li-Ion NCR18650B rechargeable Li-lon](https://www.aliexpress.com/item/32362625564.html)
